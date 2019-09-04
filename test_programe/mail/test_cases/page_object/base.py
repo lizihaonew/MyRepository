@@ -22,3 +22,13 @@ class Base(object):
 
     def open(self):
         self._open(self.url)
+
+    # *参数个数不是固定的(By.ID, 'kw')
+    def find_element(self, *loc):
+        return self.driver.find_element(*loc)
+
+    def iframe(self, iframeid):
+        return self.driver.switch_to.frame(iframeid)
+
+    def iframe_out(self):
+        return self.driver.switch_to.default_content()
