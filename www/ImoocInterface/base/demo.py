@@ -33,8 +33,8 @@ if __name__ == '__main__':
     data = {
         'cart': '11'
     }
-    run = RunMain(url, 'GET', data)
-    print run.res
+    run = RunMain()
+    run.run_main(url, 'GET', data)
 
 
 
