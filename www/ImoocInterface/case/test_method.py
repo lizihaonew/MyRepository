@@ -5,7 +5,7 @@
 # @File     : demo.py
 import json
 import unittest
-from demo import RunMain
+from www.ImoocInterface.base.demo import RunMain
 
 '''
 class TestMethod(unittest.TestCase):
@@ -35,26 +35,23 @@ class TestMethod(unittest.TestCase):
 class TestMethod(unittest.TestCase):
 
     def setUp(self):
-        print 'this is setUp method !!!'
         self.run = RunMain()
 
     def test_01(self):
-        print '第一个case'
         url = 'http://www.imooc.com/m/web/shizhanapi/loadmorepingjia.html'
         data = {
             'cart': '11'
         }
         res = self.run.run_main(url, 'POST', data)
-        print res
+        self.assertEqual(res['code'], 200)
 
     def test_02(self):
-        print '第二个case'
         url = 'http://www.imooc.com/m/web/shizhanapi/loadmorepingjia.html'
         data = {
             'cart': '12'
         }
         res = self.run.run_main(url, 'POST', data)
-        print res
+        self.assertEqual(res['code'], 200)
 
 
 if __name__ == '__main__':
