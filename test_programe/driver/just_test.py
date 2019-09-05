@@ -5,7 +5,7 @@ import time
 import requests
 import json
 from selenium.webdriver.support.select import Select
-import os, random
+import os,random
 from faker import Factory
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.wait import WebDriverWait
