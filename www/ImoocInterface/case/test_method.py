@@ -12,11 +12,11 @@ class TestMethod(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        print '类执行之前会打印，只打印一次'
+        print '类执行之前会打印，只打印一次！'
 
     @classmethod
     def tearDownClass(cls):
-        print '类执行之后会打印，只打印一次'
+        print '类执行之后会打印，只打印一次！'
 
     def setUp(self):
         print 'test --> setup'
