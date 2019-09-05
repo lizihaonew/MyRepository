@@ -5,18 +5,18 @@
 # @File     : demo.py
 import json
 import unittest
-from demo import RunMain
+from www.ImoocInterface.base.demo import RunMain
 
 '''
 class TestMethod(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        print '类执行之前会打印，只打印一次'
+        print '类执行之前会打印，只打印一次！'
 
     @classmethod
     def tearDownClass(cls):
-        print '类执行之后会打印，只打印一次'
+        print '类执行之后会打印，只打印一次！'
 
     def setUp(self):
         print 'test --> setup'
@@ -34,27 +34,48 @@ class TestMethod(unittest.TestCase):
 
 class TestMethod(unittest.TestCase):
 
+    # @classmethod
+    # def setUpClass(cls):
+    #     print '类执行之前会打印，只打印一次！'
+    #
+    # @classmethod
+    # def tearDownClass(cls):
+    #     print '类执行之后会打印，只打印一次！'
+
     def setUp(self):
-        print 'this is setUp method !!!'
         self.run = RunMain()
 
     def test_01(self):
-        print '第一个case'
         url = 'http://www.imooc.com/m/web/shizhanapi/loadmorepingjia.html'
         data = {
             'cart': '11'
         }
         res = self.run.run_main(url, 'POST', data)
-        print res
+        self.assertEqual(res['code'], 200)
+        # globals()['userId'] = 200
+        print '这是我的第一个case'
 
+    @unittest.skip('test_02')
     def test_02(self):
-        print '第二个case'
+        # print userId
         url = 'http://www.imooc.com/m/web/shizhanapi/loadmorepingjia.html'
         data = {
             'cart': '12'
         }
         res = self.run.run_main(url, 'POST', data)
-        print res
+        self.assertEqual(res['code'], 200)
+        print '这是我的第二个case'
+
+    @unittest.skipIf()
+    def test_03(self):
+        # print userId
+        url = 'http://www.imooc.com/m/web/shizhanapi/loadmorepingjia.html'
+        data = {
+            'cart': '12'
+        }
+        res = self.run.run_main(url, 'POST', data)
+        self.assertEqual(res['code'], 200)
+        print '这是我的第三个case'
 
 
 if __name__ == '__main__':
