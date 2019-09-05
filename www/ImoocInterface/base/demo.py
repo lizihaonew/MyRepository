@@ -9,8 +9,8 @@ import json
 
 
 class RunMain:
-    def __init__(self, url, mathod, data=None):
-        self.res = self.run_main(url, mathod, data)
+    # def __init__(self, url, mathod, data=None):
+    #     self.res = self.run_main(url, mathod, data)
 
     def send_get(self, url, data):
         res = requests.get(url=url, data=data).json()
@@ -25,7 +25,7 @@ class RunMain:
             res = self.send_get(url, data)
         else:
             res = self.send_post(url, data)
-        return res
+        return json.loads(res)
 
 
 if __name__ == '__main__':
