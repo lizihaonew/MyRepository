@@ -63,7 +63,7 @@ class TestSkiping(unittest.TestCase):
         self.assertEqual(res['code'], 200)
         print '这是我的第四个case'
 
-    @unittest.skipUnless(error_code2 == 200, '只有error_code2是200的时候执行')
+    @unittest.skipUnless(error_code2 == 200, '只有error_code2是200的时候执行!!!!')
     def test_05(self):
         url = 'http://www.imooc.com/m/web/shizhanapi/loadmorepingjia.html'
         data = {
