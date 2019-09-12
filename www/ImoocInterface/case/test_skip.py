@@ -14,15 +14,13 @@ unittest提供了一些跳过指定用例的方法
 
 import unittest
 from ..base.demo import RunMain
-import sys
-reload(sys)
-sys.setdefaultencoding("utf-8")
 
 
-class TestSkiping(unittest.TestCase):
+class TestSkipping(unittest.TestCase):
+    error_code2 = None
+
     def setUp(self):
         self.run = RunMain()
-        error_code2 = 200
 
     def test_01(self):
         url = 'http://www.imooc.com/m/web/shizhanapi/loadmorepingjia.html'
@@ -33,11 +31,11 @@ class TestSkiping(unittest.TestCase):
         self.assertEqual(res['code'], 200)
         print '这是我的第一个case'
 
-    @unittest.skip("跳过")
+    @unittest.skip('skip the 2nd case!!')
     def test_02(self):
         url = 'http://www.imooc.com/m/web/shizhanapi/loadmorepingjia.html'
         data = {
-            'cart': ''
+            'cart': '11'
         }
         res = self.run.run_main(url, 'POST', data)
         self.assertEqual(res['code'], 200)
@@ -51,9 +49,9 @@ class TestSkiping(unittest.TestCase):
         res = self.run.run_main(url, 'POST', data)
         print '这是我的第三个case'
         self.assertEqual(res['code'], 200)
-        # globals()['error_code2'] = res['code']
-    '''
-    @unittest.skipIf(error_code2 == 200, 'error_code2是200的时候不执行')
+        globals()['error_code2'] = 200
+
+    @unittest.skipIf(error_code2 is None, 'skip the 4th case!!')
     def test_04(self):
         url = 'http://www.imooc.com/m/web/shizhanapi/loadmorepingjia.html'
         data = {
@@ -63,6 +61,7 @@ class TestSkiping(unittest.TestCase):
         self.assertEqual(res['code'], 200)
         print '这是我的第四个case'
 
+    '''
     @unittest.skipUnless(error_code2 == 200, '只有error_code2是200的时候执行!!!!')
     def test_05(self):
         url = 'http://www.imooc.com/m/web/shizhanapi/loadmorepingjia.html'
