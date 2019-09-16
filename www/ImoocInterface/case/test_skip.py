@@ -13,16 +13,19 @@ unittest提供了一些跳过指定用例的方法
 """
 
 import unittest
-from ..base.demo import RunMain
+from www.ImoocInterface.base.demo import RunMain
+import time
+from HTMLTestRunner import HTMLTestRunner
 import sys
 reload(sys)
 sys.setdefaultencoding("utf-8")
 
 
 class TestSkiping(unittest.TestCase):
+    error_code2 = 2000
+
     def setUp(self):
         self.run = RunMain()
-        error_code2 = 200
 
     def test_01(self):
         url = 'http://www.imooc.com/m/web/shizhanapi/loadmorepingjia.html'
@@ -33,7 +36,7 @@ class TestSkiping(unittest.TestCase):
         self.assertEqual(res['code'], 200)
         print '这是我的第一个case'
 
-    @unittest.skip("跳过")
+    @unittest.skip("skip this case!!!")
     def test_02(self):
         url = 'http://www.imooc.com/m/web/shizhanapi/loadmorepingjia.html'
         data = {
@@ -52,7 +55,7 @@ class TestSkiping(unittest.TestCase):
         print '这是我的第三个case'
         self.assertEqual(res['code'], 200)
         # globals()['error_code2'] = res['code']
-    '''
+
     @unittest.skipIf(error_code2 == 200, 'error_code2是200的时候不执行')
     def test_04(self):
         url = 'http://www.imooc.com/m/web/shizhanapi/loadmorepingjia.html'
@@ -63,6 +66,7 @@ class TestSkiping(unittest.TestCase):
         self.assertEqual(res['code'], 200)
         print '这是我的第四个case'
 
+    '''
     @unittest.skipUnless(error_code2 == 200, '只有error_code2是200的时候执行!!')
     def test_05(self):
         url = 'http://www.imooc.com/m/web/shizhanapi/loadmorepingjia.html'
@@ -86,4 +90,16 @@ class TestSkiping(unittest.TestCase):
 
 
 if __name__ == '__main__':
-    unittest.main()
+    # unittest.main()
+    test_dir = './'
+    discover = unittest.defaultTestLoader.discover(test_dir, pattern='test_*.py')
+
+    now_time = time.strftime('%Y-%m-%d %H_%M_%S')
+    file_path = '../report/'+now_time+'_report.html'
+    with open(file_path, 'wb') as fp:
+        runner = HTMLTestRunner(
+            stream=fp,
+            title='test report',
+            description='2019-09-17'
+        )
+        runner.run(discover)
