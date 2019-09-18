@@ -36,11 +36,11 @@ class TestSkiping(unittest.TestCase):
         self.assertEqual(res['code'], 200)
         print '这是我的第一个case'
 
-    @unittest.skip("skip this case!!!")
+    @unittest.skip('skip the 2nd case!!')
     def test_02(self):
         url = 'http://www.imooc.com/m/web/shizhanapi/loadmorepingjia.html'
         data = {
-            'cart': ''
+            'cart': '11'
         }
         res = self.run.run_main(url, 'POST', data)
         self.assertEqual(res['code'], 200)
@@ -54,9 +54,9 @@ class TestSkiping(unittest.TestCase):
         res = self.run.run_main(url, 'POST', data)
         print '这是我的第三个case'
         self.assertEqual(res['code'], 200)
-        # globals()['error_code2'] = res['code']
+        # globals()['error_code2'] = 200
 
-    @unittest.skipIf(error_code2 == 200, 'error_code2是200的时候不执行')
+    @unittest.skipIf(error_code2 is None, 'skip the 4th case!!')
     def test_04(self):
         url = 'http://www.imooc.com/m/web/shizhanapi/loadmorepingjia.html'
         data = {
@@ -67,7 +67,7 @@ class TestSkiping(unittest.TestCase):
         print '这是我的第四个case'
 
     '''
-    @unittest.skipUnless(error_code2 == 200, '只有error_code2是200的时候执行!!')
+    @unittest.skipUnless(error_code2 == 200, '只有error_code2是200的时候执行!!!!')
     def test_05(self):
         url = 'http://www.imooc.com/m/web/shizhanapi/loadmorepingjia.html'
         data = {
