@@ -13,11 +13,16 @@ unittest提供了一些跳过指定用例的方法
 """
 
 import unittest
-from ..base.demo import RunMain
+from www.ImoocInterface.base.demo import RunMain
+import time
+from HTMLTestRunner import HTMLTestRunner
+import sys
+reload(sys)
+sys.setdefaultencoding("utf-8")
 
 
-class TestSkipping(unittest.TestCase):
-    error_code2 = None
+class TestSkiping(unittest.TestCase):
+    error_code2 = 2000
 
     def setUp(self):
         self.run = RunMain()
@@ -49,7 +54,7 @@ class TestSkipping(unittest.TestCase):
         res = self.run.run_main(url, 'POST', data)
         print '这是我的第三个case'
         self.assertEqual(res['code'], 200)
-        globals()['error_code2'] = 200
+        # globals()['error_code2'] = 200
 
     @unittest.skipIf(error_code2 is None, 'skip the 4th case!!')
     def test_04(self):
@@ -85,4 +90,16 @@ class TestSkipping(unittest.TestCase):
 
 
 if __name__ == '__main__':
-    unittest.main()
+    # unittest.main()
+    test_dir = './'
+    discover = unittest.defaultTestLoader.discover(test_dir, pattern='test_*.py')
+
+    now_time = time.strftime('%Y-%m-%d %H_%M_%S')
+    file_path = '../report/'+now_time+'_report.html'
+    with open(file_path, 'wb') as fp:
+        runner = HTMLTestRunner(
+            stream=fp,
+            title='test report',
+            description='2019-09-17'
+        )
+        runner.run(discover)
