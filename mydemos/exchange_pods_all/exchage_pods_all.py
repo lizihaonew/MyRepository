@@ -1,31 +1,35 @@
-#!/usr/bin/python3
+#!/usr/bin/python2
 # -*- coding: utf-8 -*-
 # @Author   : Lizihao
 # @Time     : 2019/4/14 12:21
 # @File     : update_pod.py
 
 """
-该脚本主要用于在服务器更新微服务镜像版本号，并可自动apply deploy.yml文件。
-用法：
-1. 在使用前，以项目级修改配置信息
-2. 配置信息中，base_path为各服务公共目录的最深一层，log_file为日志文件
-3. 使用前必须保证各个服务deploy文件的上一层目录名与镜像服务名一致
-    如:  /data/…/wbs-web/deploy.yml  ==>  wbs-web:1234567890
-4. 将该脚本复制到服务器中使用
-
+获取某个环境的镜像版本并更新到指定环境下
+grep -r "image: registry.newbanker.cn:5000/newbanker/" ./
 """
 
 import re
-import os, time
-
+import os
+import time
 
 # ******** 配置信息 ******** #
-project_version = "宁圣私有化项目 1.0"
-namespace = "ningsheng"
-base_path = "/data/k8s/ningsheng"
-log_file = "/data/k8s/ningsheng/pods_update.log"
-
+project_version = "宁圣私有化项目dev环境"
+namespace = "private-240"
+base_path = "/data/k8s/private"
+log_file = "/data/k8s/private/pods_update.log"
+file_path = './11111.txt'
 # ************************** #
+
+
+def get_image_versions():
+    with open(file_path, 'r') as fb:
+        content = []
+        for line in fb.readlines():
+            line_version = re.findall(r':#{0}\s+image.+/newbanker/(.+:\d+)', line)
+            if line_version:
+                content.append(line_version[0])
+    return content
 
 
 def get_path(server_name):
@@ -94,12 +98,11 @@ def record_log():
         log_obj.write(content.format(version_name, version_old, op_time, project_version) + content_older)
 
 
-def do_update():
-    print(">>> 请输入镜像版本号，例：nsprivate-web:2019040901")
+def do_update(image_version):
     global version_name
     global yml_file
     while True:
-        version_name = input(">>> 请输入：")
+        version_name = image_version
         if ":" not in version_name:
             print("输入格式不对，请重新输入")
             continue
@@ -130,21 +133,13 @@ def do_update():
         os.system(list_command)
 
 
-if __name__ == "__main__":
-    do_update()
+def main_func():
+    image_versions = get_image_versions()
 
-"""
-# 单元测试case集
-wbs-cms:12424314124
-open-api:123424241
-wbs-web:213421421
-marketing-admin:12421424212
-marketing-api:34142142
-marketing-center:12421412412
-wbs_web:213421421
-123214wbs-web:213421421
-open-api:wqe
-:12321212
-open-api:
-输入为空
-"""
+    for image in image_versions:
+        do_update(image)
+        time.sleep(5)
+
+
+if __name__ == '__main__':
+    main_func()
