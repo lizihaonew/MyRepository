@@ -1,25 +1,25 @@
 销售快报：
     按部门统计：
         本日投资总额
-SELECT * FROM `ns_order` WHERE trans_time LIKE '2019-04-03%' AND asset_id = 1;
+SELECT sum(trans_amount) FROM `ns_order` WHERE trans_time LIKE '2019-04-03%' AND asset_id = 1;
         昨日投资总额
-SELECT * FROM `ns_order` WHERE trans_time LIKE '2019-04-03%' AND asset_id = 1;
+SELECT sum(trans_amount) FROM `ns_order` WHERE trans_time LIKE '2019-04-03%' AND asset_id = 1;
         昨日投资业绩
-
+SELECT SUM(performance_amount) FROM `ns_sop_order_snapshot` WHERE trans_time LIKE '2019-08-27%' AND department_no = 'SHNMCW00020001' AND asset_id = 1;
         本日投资笔数
-
+SELECT COUNT(1) FROM `ns_order` WHERE trans_time LIKE '2019-05-07%' AND dept_code = 'SHNMCW0001' AND asset_id = 1;
         昨日投资笔数
-
+SELECT COUNT(1) FROM `ns_order` WHERE trans_time LIKE '2019-05-07%' AND dept_code = 'SHNMCW0001' AND asset_id = 1;
         本月累计已还款
-
+SELECT SUM(actual_repay) FROM `wbs_received_payment` WHERE actual_exit_time LIKE '2019-10%' AND dept_code = 'SHNMCW0001' AND order_no IN (SELECT order_no FROM `ns_order` WHERE 1=1 AND asset_id = 1);
         本月累计待还款
-
+SELECT SUM(actual_repay) FROM `wbs_received_payment` WHERE actual_exit_time LIKE '2019-10%' AND dept_code = 'SHNMCW0001' AND order_no IN (SELECT order_no FROM `ns_order` WHERE 1=1 AND asset_id = 1);
         本月累计提现
-
+SELECT SUM(cashout_amount) FROM `ns_cashout_record` WHERE 1=1 AND cashout_time LIKE '2019-07-09%' AND dept_code LIKE 'SHNMCW0006%' AND asset_id = 1;
         本日累计提现
-
+SELECT SUM(cashout_amount) FROM `ns_cashout_record` WHERE 1=1 AND cashout_time LIKE '2019-07-09%' AND dept_code LIKE 'SHNMCW0006%' AND asset_id = 1;
         昨日累计提现
-
+SELECT SUM(cashout_amount) FROM `ns_cashout_record` WHERE 1=1 AND cashout_time LIKE '2019-07-09%' AND dept_code LIKE 'SHNMCW0006%' AND asset_id = 1;
         本日提现占比
 
         昨日提现占比
