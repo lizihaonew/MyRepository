@@ -30,19 +30,25 @@ class Optsql:
             charset='utf8'
         )
 
+        global cur
         cur = conn.cursor()
         return cur
 
-    def object_close(self, cur):
+    def object_close(self):
         cur.close()
         conn.close()
 
-    def execute_select(self, sql):
-        cur = self.conn_mysql()
-        cur.execute(sql)
-        self.object_close(cur)
-        return cur.fetchall()
+    # def execute_select(self, sql):
+    #     cur = self.conn_mysql()
+    #     cur.execute(sql)
+    #     self.object_close(cur)
+    #     return cur.fetchall()
 
+    def execute_select(self, cur, sql):
+        # cur = self.conn_mysql()
+        cur.execute(sql)
+        # self.object_close(cur)
+        return cur.fetchall()
 
 if __name__ == '__main__':
     ops = Optsql()
