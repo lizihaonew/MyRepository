@@ -6,13 +6,16 @@
 
 import pymysql
 
-######### 配置信息 #############
+
+# ######## 配置信息 #############
+
 host = 'rm-2ze1w9epp05wvc4j4po.mysql.rds.aliyuncs.com'
 username = 'private'
 password = '1qaz@WSX'
 db = 'wbs_pri'
 new_entId = '888'
-################################
+
+# ###############################
 
 
 class Optsql:
@@ -49,6 +52,7 @@ class Optsql:
         cur.execute(sql)
         # self.object_close(cur)
         return cur.fetchall()
+
 
 if __name__ == '__main__':
     ops = Optsql()
