@@ -1,0 +1,165 @@
+销售快报：
+    按部门统计：
+        本日投资总额
+SELECT sum(trans_amount) FROM `ns_order` WHERE trans_time LIKE '2019-04-03%' AND asset_id = 1;
+        昨日投资总额
+SELECT sum(trans_amount) FROM `ns_order` WHERE trans_time LIKE '2019-04-03%' AND asset_id = 1;
+        昨日投资业绩
+SELECT SUM(performance_amount) FROM `ns_sop_order_snapshot` WHERE trans_time LIKE '2019-08-27%' AND department_no = 'SHNMCW00020001' AND asset_id = 1;
+        本日投资笔数
+SELECT COUNT(1) FROM `ns_order` WHERE trans_time LIKE '2019-05-07%' AND dept_code = 'SHNMCW0001' AND asset_id = 1;
+        昨日投资笔数
+SELECT COUNT(1) FROM `ns_order` WHERE trans_time LIKE '2019-05-07%' AND dept_code = 'SHNMCW0001' AND asset_id = 1;
+        本月累计已还款
+SELECT SUM(actual_repay) FROM `wbs_received_payment` WHERE actual_exit_time LIKE '2019-10%' AND dept_code = 'SHNMCW0001' AND order_no IN (SELECT order_no FROM `ns_order` WHERE 1=1 AND asset_id = 1);
+        本月累计待还款
+SELECT SUM(actual_repay) FROM `wbs_received_payment` WHERE actual_exit_time LIKE '2019-10%' AND dept_code = 'SHNMCW0001' AND order_no IN (SELECT order_no FROM `ns_order` WHERE 1=1 AND asset_id = 1);
+        本月累计提现
+SELECT SUM(cashout_amount) FROM `ns_cashout_record` WHERE 1=1 AND cashout_time LIKE '2019-07-09%' AND dept_code LIKE 'SHNMCW0006%' AND asset_id = 1;
+        本日累计提现
+SELECT SUM(cashout_amount) FROM `ns_cashout_record` WHERE 1=1 AND cashout_time LIKE '2019-07-09%' AND dept_code LIKE 'SHNMCW0006%' AND asset_id = 1;
+        昨日累计提现
+SELECT SUM(cashout_amount) FROM `ns_cashout_record` WHERE 1=1 AND cashout_time LIKE '2019-07-09%' AND dept_code LIKE 'SHNMCW0006%' AND asset_id = 1;
+        本日提现占比
+
+        昨日提现占比
+
+        本月累计充值
+
+        本日累计充值
+
+        昨日累计充值
+
+        本日充值投资占比
+
+        本日还款投资
+
+        本日还款投资占比
+
+        本日净资金流
+
+        昨日净资金流
+
+        客户待收总额
+
+        客户沉淀总额
+
+        本日累计开户数
+
+        昨日累计开户数
+
+        本月累计首投达标客户数
+
+        本日累计首投达标客户数
+
+        本日各产品类型投资总额
+
+        本日各期限产品投资总额
+
+
+    按员工统计
+        员工基本数据展示
+
+        本日投资总额
+
+        昨日投资总额
+
+        昨日投资业绩
+
+        本日投资笔数
+
+        昨日投资笔数
+
+        客户待收总额
+
+        客户沉淀总额
+
+        本日累计开户数
+
+        昨日累计开户数
+
+        本月首投达标客户数
+
+        本日累计首投达标客户数
+
+
+
+销售日报
+    当日投资总额
+
+    当日投资笔数
+
+    当日投资业绩
+
+    当日还款总额
+
+    当日提现总额
+
+    当日提现占比
+
+    当日充值总额
+
+    当日充值投资占比
+
+    当日还款投资
+
+    当日还款投资占比
+
+    当日净资金流
+
+    当日待收总额
+
+    当日沉淀总额
+
+    当日开户客户数
+
+    当日首投达标客户数
+
+    当日各产品类型投资总额
+
+    当日各期限产品投资总额
+
+
+
+销售月报
+    当月投资总额
+
+    上月投资总额
+
+    投资总额环比增速
+
+    当月投资笔数
+
+    当月投资业绩
+
+    上月投资业绩
+
+    投资业绩环比增速
+
+    当月还款总额
+
+    当月提现总额
+
+    当月提现占比
+
+    当月充值总额
+
+    当月充值投资占比
+
+    当月还款投资
+
+    当月还款投资占比
+
+    当月净资金流
+
+    当月待收总额
+
+    当月沉淀总额
+
+    当月开户客户数
+
+    当月首投达标客户数
+
+    当月各产品类型投资总额
+
+    当月各期限产品投资总额

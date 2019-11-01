@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 # @Author   : Lizihao
 # @Time     : 2018/11/7 22:52
-# @File     : exchage_entId.py
+# @File     : update_entId.py
 
 """
 该脚本用于更新目标数据库中所有表的entId为指定的new_entId
