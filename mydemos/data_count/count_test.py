@@ -9,14 +9,14 @@ from dept_count import dept_count_main
 from employee_count import employee_count_main
 from month_count import month_count_main
 
-count_type = 'yuangong'
-
 # #########################
 # 配置count_type字段值
-# bumen = 销售快报 - 按部门统计  SHNMCW0002
-# yuangong = 销售快报 - 按员工统计
-# ribao = 销售日报
-# yuebao = 销售月报
+# bumen = 销售快报 - 按部门统计  SHNMCW0002  1
+# yuangong = 销售快报 - 按员工统计   13666666661
+# ribao = 销售日报  SHNMCW0002  2019-11-01
+# yuebao = 销售月报 SHNMCW0002  2019-11
+
+count_type = 'yuebao'
 # #########################
 
 
@@ -37,10 +37,18 @@ elif count_type == 'yuangong':
     employee_count_main(employee_mobile)
 elif count_type == 'ribao':
     print('现在操作的是 销售日报。')
-    date_count_main()
+    dept = input('请输入部门code：')
+    print('请输入需要搜索的日期：0-默认的今天，日期格式如：2019-11-01')
+    date = input('请输入日期：')
+    print('==================================>>>')
+    date_count_main(dept, date)
 elif count_type == 'yuebao':
     print('现在操作的是 销售月报。')
-    month_count_main()
+    dept = input('请输入部门code：')
+    print('请输入需要搜索的日期：0-默认的今天，日期格式如：2019-11')
+    date = input('请输入日期：')
+    print('==================================>>>')
+    month_count_main(dept, date)
 else:
     print('count_type 字段输入错误')
 

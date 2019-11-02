@@ -179,10 +179,10 @@ class DeptCount(Optsql):
                                              "{2};".format(self.yesterday, self.dept, self.asset_sql1)
         stock_openaccount_amount_today_sql = "SELECT COUNT(1) FROM `wbs_stock_customer` WHERE 1=1 AND dept_code " \
                                              "LIKE '{1}%' AND platform_account_opening_time LIKE '{0}%' " \
-                                             "AND deleted=1 {2};".format(self.today, self.dept, self.asset_sql1)
+                                             "AND deleted=0 {2};".format(self.today, self.dept, self.asset_sql1)
         stock_openaccount_amount_yesterday_sql = "SELECT COUNT(1) FROM `wbs_stock_customer` WHERE 1=1 AND dept_code " \
                                              "LIKE '{1}%' AND platform_account_opening_time LIKE '{0}%' " \
-                                             "AND deleted=1 {2};".format(self.yesterday, self.dept, self.asset_sql1)
+                                             "AND deleted=0 {2};".format(self.yesterday, self.dept, self.asset_sql1)
 
         asset_openaccount_amount_today = self.exchange_None(self.execute_select(self.cur,asset_openaccount_amount_today_sql)[0][0])
         asset_openaccount_amount_yesterday = self.exchange_None(self.execute_select(self.cur,asset_openaccount_amount_yesterday_sql)[0][0])
@@ -272,7 +272,7 @@ class DeptCount(Optsql):
                 unit_name = '年'
             for num in deadline_nums_today:
                 invest_amount_today_sql = "SELECT SUM(trans_amount) FROM `ns_order` WHERE deadline_unit={0} AND trans_time LIKE" \
-                                          " '{1}%' AND deadline_unit={4} AND dept_code LIKE '{2}%' " \
+                                          " '{1}%' AND deadline_num={4} AND dept_code LIKE '{2}%' " \
                                           "{3};".format(unit, self.today, self.dept, self.asset_sql, num)
                 # print([product_type_name_sql,invest_amount_today_sql])
                 deadline_name = '{0}{1}'.format(str(num), unit_name)
