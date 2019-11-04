@@ -80,15 +80,14 @@ class MonthCount(Optsql):
 
     def cashout_amount(self):
         ''' 当月提现总额 '''
-        cashout_current_month_sql = "SELECT SUM(cashout_amount) FROM `ns_cashout_record` WHERE 1=1 AND Convert(cashout_time,CHAR(20)) " \
+        cashout_current_month_sql = "SELECT SUM(cashout_amount) FROM `ns_cashout_record` WHERE 1=1 AND STATUS=3 AND Convert(cashout_time,CHAR(20)) " \
                             "LIKE '{0}%' AND dept_code LIKE '{1}%';".format(self.current_month, self.dept)
-
         cashout_current_month = self.exchange_None(self.execute_select(self.cur, cashout_current_month_sql)[0][0])
         return str(cashout_current_month)
 
     def recharge_amount_current_month(self):
         ''' 当月充值总额 '''
-        recharge_current_month_sql = "SELECT SUM(recharge_amount) FROM `ns_recharge_record` WHERE 1=1 AND Convert(recharge_time,CHAR(20)) " \
+        recharge_current_month_sql = "SELECT SUM(recharge_amount) FROM `ns_recharge_record` WHERE 1=1 AND STATUS=3 AND Convert(recharge_time,CHAR(20)) " \
                             "LIKE '{0}%' AND dept_code LIKE '{1}%';".format(self.current_month, self.dept)
         recharge_current_month = self.exchange_None(self.execute_select(self.cur, recharge_current_month_sql)[0][0])
         return str(recharge_current_month)
@@ -249,4 +248,4 @@ def month_count_main(dept, date):
 
 if __name__ == '__main__':
     # month_count_main('SHNMCW0002', '0')
-    month_count_main('SHNMCW0001', '2019-10')
+    month_count_main('SHNMCW0002', '2019-11')

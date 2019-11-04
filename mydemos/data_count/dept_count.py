@@ -93,14 +93,13 @@ class DeptCount(Optsql):
 
     def cashout_amount(self):
         ''' 本月累计提现、本日累计提现、昨日累计提现 '''
-        cashout_current_month_sql = "SELECT SUM(cashout_amount) FROM `ns_cashout_record` WHERE 1=1 AND Convert(cashout_time,CHAR(20)) " \
+        cashout_current_month_sql = "SELECT SUM(cashout_amount) FROM `ns_cashout_record` WHERE 1=1 AND STATUS=3 AND Convert(cashout_time,CHAR(20)) " \
                                     "LIKE '{0}%' AND dept_code LIKE " \
                                     "'{1}%' {2}".format(self.current_month, self.dept, self.asset_sql)
-
-        cashout_today_sql = "SELECT SUM(cashout_amount) FROM `ns_cashout_record` WHERE 1=1 AND Convert(cashout_time,CHAR(20)) " \
+        cashout_today_sql = "SELECT SUM(cashout_amount) FROM `ns_cashout_record` WHERE 1=1 AND STATUS=3 AND Convert(cashout_time,CHAR(20)) " \
                                     "LIKE '{0}%' AND dept_code LIKE " \
                                     "'{1}%' {2}".format(self.today, self.dept, self.asset_sql)
-        cashout_yesterday_sql = "SELECT SUM(cashout_amount) FROM `ns_cashout_record` WHERE 1=1 AND Convert(cashout_time,CHAR(20)) " \
+        cashout_yesterday_sql = "SELECT SUM(cashout_amount) FROM `ns_cashout_record` WHERE 1=1 AND STATUS=3 AND Convert(cashout_time,CHAR(20)) " \
                                     "LIKE '{0}%' AND dept_code LIKE " \
                                     "'{1}%' {2}".format(self.yesterday, self.dept, self.asset_sql)
         cashout_current_month = self.exchange_None(self.execute_select(self.cur,cashout_current_month_sql)[0][0])
@@ -122,14 +121,13 @@ class DeptCount(Optsql):
 
     def recharge_amount(self):
         ''' 本月累计充值、本日累计充值、昨日累计充值 '''
-        recharge_current_month_sql = "SELECT SUM(recharge_amount) FROM `ns_recharge_record` WHERE 1=1 AND Convert(recharge_time,CHAR(20)) " \
+        recharge_current_month_sql = "SELECT SUM(recharge_amount) FROM `ns_recharge_record` WHERE 1=1 AND STATUS=3 AND Convert(recharge_time,CHAR(20)) " \
                                     "LIKE '{0}%' AND dept_code LIKE " \
                                     "'{1}%' {2}".format(self.current_month, self.dept, self.asset_sql)
-
-        recharge_today_sql = "SELECT SUM(recharge_amount) FROM `ns_recharge_record` WHERE 1=1 AND Convert(recharge_time,CHAR(20)) " \
+        recharge_today_sql = "SELECT SUM(recharge_amount) FROM `ns_recharge_record` WHERE 1=1 AND STATUS=3 AND Convert(recharge_time,CHAR(20)) " \
                             "LIKE '{0}%' AND dept_code LIKE " \
                             "'{1}%' {2}".format(self.today, self.dept, self.asset_sql)
-        recharge_yesterday_sql = "SELECT SUM(recharge_amount) FROM `ns_recharge_record` WHERE 1=1 AND Convert(recharge_time,CHAR(20)) " \
+        recharge_yesterday_sql = "SELECT SUM(recharge_amount) FROM `ns_recharge_record` WHERE 1=1 AND STATUS=3 AND Convert(recharge_time,CHAR(20)) " \
                                 "LIKE '{0}%' AND dept_code LIKE " \
                                 "'{1}%' {2}".format(self.yesterday, self.dept, self.asset_sql)
         recharge_current_month = self.exchange_None(self.execute_select(self.cur,recharge_current_month_sql)[0][0])

@@ -67,15 +67,14 @@ class DateCount(Optsql):
 
     def cashout_amount(self):
         ''' 当日提现总额 '''
-        cashout_today_sql = "SELECT SUM(cashout_amount) FROM `ns_cashout_record` WHERE 1=1 AND Convert(cashout_time,CHAR(20)) " \
+        cashout_today_sql = "SELECT SUM(cashout_amount) FROM `ns_cashout_record` WHERE 1=1 AND STATUS=3 AND Convert(cashout_time,CHAR(20)) " \
                             "LIKE '{0}%' AND dept_code LIKE '{1}%';".format(self.date, self.dept)
-
         cashout_today = self.exchange_None(self.execute_select(self.cur, cashout_today_sql)[0][0])
         return str(cashout_today)
 
     def recharge_amount_today(self):
         ''' 当日充值总额 '''
-        recharge_today_sql = "SELECT SUM(recharge_amount) FROM `ns_recharge_record` WHERE 1=1 AND Convert(recharge_time,CHAR(20)) " \
+        recharge_today_sql = "SELECT SUM(recharge_amount) FROM `ns_recharge_record` WHERE 1=1 AND STATUS=3 AND Convert(recharge_time,CHAR(20)) " \
                             "LIKE '{0}%' AND dept_code LIKE '{1}%';".format(self.date, self.dept)
         recharge_today = self.exchange_None(self.execute_select(self.cur, recharge_today_sql)[0][0])
         return str(recharge_today)
