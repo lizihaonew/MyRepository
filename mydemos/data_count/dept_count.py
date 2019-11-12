@@ -310,22 +310,23 @@ def dept_count_main(dept, asset):
     current_month_actual_exit_amount, current_month_expected_exit_amount = dc.repayment_amount()
     cashout_current_month,cashout_today,cashout_yesterday = dc.cashout_amount()
     exit_amount_today,exit_amount_yesterday = dc.exit_amount()
-    if exit_amount_today != '0':
+
+    if exit_amount_today != '0.0':
         cashout_proportion_today = str('%.2f%%' % eval(cashout_today+'/'+exit_amount_today+'*100'))
     else:
         cashout_proportion_today = '0'
 
-    if exit_amount_yesterday != '0':
+    if exit_amount_yesterday != '0.0':
         cashout_proportion_yesterday = str('%.2f%%' % eval(cashout_yesterday+'/'+exit_amount_yesterday+'*100'))
     else:
         cashout_proportion_yesterday = '0'
     recharge_current_month,recharge_today,recharge_yesterday = dc.recharge_amount()
-    if today_amount != '0':
+    if today_amount != '0.0':
         recharge_proportion_today = str('%.2f%%' % eval(recharge_today+'/'+today_amount+'*100'))
     else:
         recharge_proportion_today = '0'
     repay_investor_today = str(eval(today_amount+'-'+recharge_today))
-    if today_amount != '0':
+    if today_amount != '0.0':
         repay_investor_proportion_today = str('%.2f%%' % eval(repay_investor_today+'/'+today_amount + '*100'))
     else:
         repay_investor_proportion_today = '0'
@@ -401,8 +402,8 @@ def dept_count_main(dept, asset):
 
 
 if __name__ == '__main__':
-    # dept_count_main('SHNMCW0002'，0)
-    dept_count_main('SHNMCW0002', 3)
+    dept_count_main('SHNMCW00020001', 0)
+    # dept_count_main('SHNMCW0002', 3)
     # dcc = DeptCount('SHNMCW0002', 3)
     # print(dcc.type_invest_amount())
 

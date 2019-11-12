@@ -191,29 +191,29 @@ def month_count_main(dept, date):
     dept_name, the_month = mc.dept_name_date()
     current_month_amount = mc.current_month_invest_amount()
     last_month_amount = mc.last_month_invest_amount()
-    if last_month_amount == '0':
+    if last_month_amount == '0.0':
         investment_growth_rate = '0'
     else:
         investment_growth_rate = '%.4f%%' % ((float(current_month_amount)-float(last_month_amount))/float(last_month_amount))*100
     current_month_count = mc.invest_count()
     current_month_performance_amount, last_month_performance_amount = mc.performance_amount()
-    if last_month_performance_amount == '0':
+    if last_month_performance_amount == '0.0':
         performance_growth_rate = '0'
     else:
         performance_growth_rate = '%.4f%%' % ((float(current_month_performance_amount)-float(last_month_performance_amount))/float(last_month_performance_amount))*100
     repayed_amount_current_month = mc.repayment_amount_current_month()
     cashout_current_month = mc.cashout_amount()
-    if repayed_amount_current_month != '0':
+    if repayed_amount_current_month != '0.0':
         cashout_proportion_current_month = str('%.2f%%' % eval(cashout_current_month+'/'+repayed_amount_current_month+'*100'))
     else:
         cashout_proportion_current_month = '0'
     recharge_current_month = mc.recharge_amount_current_month()
-    if current_month_amount != '0':
+    if current_month_amount != '0.0':
         recharge_proportion_current_month = str('%.4f%%' % eval(recharge_current_month+'/'+current_month_amount+'*100'))
     else:
         recharge_proportion_current_month = '0'
     repay_investor_current_month = str(eval(current_month_amount + '-' + recharge_current_month))
-    if current_month_amount != '0':
+    if current_month_amount != '0.0':
         repay_investor_proportion_current_month = str('%.4f%%' % eval(repay_investor_current_month+'/'+current_month_amount+'*100'))
     else:
         repay_investor_proportion_current_month = '0'

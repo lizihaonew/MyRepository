@@ -184,17 +184,17 @@ def date_count_main(dept, date):
     today_performance_amount = dcm.today_performance_amount()
     repayed_amount_today = dcm.repayment_amount_today()
     cashout_today = dcm.cashout_amount()
-    if repayed_amount_today != '0':
+    if repayed_amount_today != '0.0':
         cashout_proportion_today = str('%.4f%%' % eval(cashout_today+'/'+repayed_amount_today+'*100'))
     else:
         cashout_proportion_today = '0'
     recharge_today = dcm.recharge_amount_today()
-    if today_amount != '0':
+    if today_amount != '0.0':
         recharge_proportion_today = str('%.4f%%' % eval(recharge_today+'/'+today_amount+'*100'))
     else:
         recharge_proportion_today = '0'
     repay_investor_today = str(eval(today_amount + '-' + recharge_today))
-    if today_amount != '0':
+    if today_amount != '0.0':
         repay_investor_proportion_today = str('%.4f%%' % eval(repay_investor_today+'/'+today_amount+'*100'))
     else:
         repay_investor_proportion_today = '0'
