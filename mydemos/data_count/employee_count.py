@@ -17,7 +17,8 @@ class EmployeeCount(Optsql):
         self.today = str(date_today)
         self.yesterday = str(date_today - datetime.timedelta(days=1))
         self.current_month = time.strftime('%Y-%m')
-        self.fa_id = str(self.execute_select(self.cur, "SELECT id FROM `wbs_employee` WHERE mobile='{0}' AND dismissionDate IS NULL;".format(self.mobile))[0][0])
+        self.fa_id = str(self.execute_select(self.cur, "SELECT id FROM `wbs_employee` WHERE mobile='{0}' AND "
+                                                       "dismissionDate IS NULL;".format(self.mobile))[0][0])
 
     def exchange_None(self,para):
         if para:
@@ -36,19 +37,17 @@ class EmployeeCount(Optsql):
     def invest_amount(self):
         '''本日投资总额、昨日投资总额'''
         today_amount_sql = "SELECT SUM(trans_amount) FROM `ns_order` WHERE fa_id='{0}' AND trans_time LIKE '{1}%';".format(self.fa_id, self.today)
-
         yesterday_amount_sql = "SELECT SUM(trans_amount) FROM `ns_order` WHERE fa_id='{0}' AND trans_time LIKE '{1}%';".format(self.fa_id, self.yesterday)
         today_amount = self.exchange_None(self.execute_select(self.cur, today_amount_sql)[0][0])
         yesterday_amount = self.exchange_None(self.execute_select(self.cur, yesterday_amount_sql)[0][0])
-        return [str(today_amount), str(yesterday_amount)]
+        return [str(today_amount/10000), str(yesterday_amount/10000)]
 
     def yesterday_performance_amount(self):
         '''昨日投资业绩'''
         yesterday_amount_sql = "SELECT sum(performance_amount) FROM ns_sop_order_snapshot WHERE advisor_id={0} AND " \
                                "trans_time LIKE '{1}%';".format(self.fa_id,self.yesterday)
         yesterday_performance_amount = self.exchange_None(self.execute_select(self.cur,yesterday_amount_sql)[0][0])
-
-        return str(yesterday_performance_amount)
+        return str(yesterday_performance_amount/10000)
 
     def invest_count(self):
         '''本日投资笔数、昨日投资笔数'''
@@ -68,14 +67,13 @@ class EmployeeCount(Optsql):
                                           "AND deleted=0;".format(self.fa_id)
         stock_precipitated_capital_sql = "SELECT SUM(precipitated_capital) FROM wbs_stock_customer WHERE fa_id={0} " \
                                           "AND deleted=0;".format(self.fa_id)
-
         asset_funds_to_be_collected = self.exchange_None(self.execute_select(self.cur,asset_funds_to_be_collected_sql)[0][0])
         asset_precipitated_capital = self.exchange_None(self.execute_select(self.cur,asset_precipitated_capital_sql)[0][0])
         stock_funds_to_be_collected = self.exchange_None(self.execute_select(self.cur,stock_funds_to_be_collected_sql)[0][0])
         stock_precipitated_capital = self.exchange_None(self.execute_select(self.cur,stock_precipitated_capital_sql)[0][0])
         funds_to_be_collected = asset_funds_to_be_collected + stock_funds_to_be_collected
         precipitated_capital = asset_precipitated_capital + stock_precipitated_capital
-        return [str(funds_to_be_collected), str(precipitated_capital)]
+        return [str(funds_to_be_collected/10000), str(precipitated_capital/10000)]
 
     def openaccount_amount(self):
         ''' 本日累计开户数、昨日累计开户数 '''
@@ -89,14 +87,12 @@ class EmployeeCount(Optsql):
                                              "AND platform_account_opening_time LIKE '{1}%';".format(self.fa_id, self.today)
         stock_openaccount_amount_yesterday_sql = "SELECT COUNT(1) FROM wbs_stock_customer WHERE fa_id={0} AND deleted=0 " \
                                              "AND platform_account_opening_time LIKE '{1}%';".format(self.fa_id, self.yesterday)
-
         asset_openaccount_amount_today = self.exchange_None(self.execute_select(self.cur,asset_openaccount_amount_today_sql)[0][0])
         asset_openaccount_amount_yesterday = self.exchange_None(self.execute_select(self.cur,asset_openaccount_amount_yesterday_sql)[0][0])
         stock_openaccount_amount_today = self.exchange_None(self.execute_select(self.cur,stock_openaccount_amount_today_sql)[0][0])
         stock_openaccount_amount_yesterday = self.exchange_None(self.execute_select(self.cur,stock_openaccount_amount_yesterday_sql)[0][0])
         openaccount_amount_today = asset_openaccount_amount_today + stock_openaccount_amount_today
         openaccount_amount_yesterday = asset_openaccount_amount_yesterday + stock_openaccount_amount_yesterday
-
         return [str(openaccount_amount_today), str(openaccount_amount_yesterday)]
 
     def first_invest_match_count(self):
