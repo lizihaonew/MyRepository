@@ -129,15 +129,12 @@ class MonthCount(Optsql):
     def first_invest_match_count(self):
         ''' 当月首投达标客户数 '''
         ''' fimc = first_invest_match_count '''
-        current_month_HY_fimc_sql = "SELECT COUNT(1) FROM (SELECT DISTINCT cus_id FROM `ns_order` WHERE Convert(trans_time,CHAR(20)) LIKE '{0}%'" \
-                        " AND first_invest=1 AND dept_code LIKE '{1}%' AND asset_id=1 AND trans_amount>=3000) " \
-                        "s;".format(self.current_month, self.dept)
-        current_month_HJS_fimc_sql = "SELECT COUNT(1) FROM (SELECT DISTINCT cus_id FROM `ns_order` WHERE Convert(trans_time,CHAR(20)) LIKE '{0}%'" \
-                        " AND first_invest=1 AND dept_code LIKE '{1}%' AND asset_id=2 AND trans_amount>=20000) " \
-                        "s;".format(self.current_month, self.dept)
-        current_month_HP_fimc_sql = "SELECT COUNT(1) FROM (SELECT DISTINCT cus_id FROM `ns_order` WHERE Convert(trans_time,CHAR(20)) LIKE '{0}%'" \
-                        " AND first_invest=1 AND dept_code LIKE '{1}%' AND asset_id=3 AND trans_amount>=20000) " \
-                        "s;".format(self.current_month, self.dept)
+        current_month_HY_fimc_sql = "SELECT COUNT(1) FROM `ns_order` WHERE Convert(trans_time,CHAR(20)) LIKE '{0}%'" \
+                        " AND first_invest=1 AND dept_code LIKE '{1}%' AND asset_id=1 AND trans_amount>=3000;".format(self.current_month, self.dept)
+        current_month_HJS_fimc_sql = "SELECT COUNT(1) FROM `ns_order` WHERE Convert(trans_time,CHAR(20)) LIKE '{0}%'" \
+                        " AND first_invest=1 AND dept_code LIKE '{1}%' AND asset_id=2 AND trans_amount>=20000;".format(self.current_month, self.dept)
+        current_month_HP_fimc_sql = "SELECT COUNT(1) FROM `ns_order` WHERE Convert(trans_time,CHAR(20)) LIKE '{0}%'" \
+                        " AND first_invest=1 AND dept_code LIKE '{1}%' AND asset_id=3 AND trans_amount>=20000;".format(self.current_month, self.dept)
         current_month_HY_fimc = self.exchange_None(self.execute_select(self.cur, current_month_HY_fimc_sql)[0][0])
         current_month_HJS_fimc = self.exchange_None(self.execute_select(self.cur, current_month_HJS_fimc_sql)[0][0])
         current_month_HP_fimc = self.exchange_None(self.execute_select(self.cur, current_month_HP_fimc_sql)[0][0])
@@ -158,7 +155,7 @@ class MonthCount(Optsql):
             product_type_invest_amount = self.exchange_None(self.execute_select(self.cur, invest_amount_current_month_sql)[0][0])
             if not product_type_invest_amount:
                 continue
-            result_product_type_invest.append((product_type_name+':%s' % str(id), '%.2f' % (product_type_invest_amount/10000)))
+            result_product_type_invest.append((product_type_name+':%s' % str(id), '%.4f' % (product_type_invest_amount/10000)))
         return str(result_product_type_invest)
 
     def deadline_num_invest_amount(self):
@@ -182,7 +179,7 @@ class MonthCount(Optsql):
                 deadline_invest_amount = self.exchange_None(self.execute_select(self.cur, invest_amount_current_month_sql)[0][0])
                 if not deadline_invest_amount:
                     continue
-                result_deadline_invest.append(deadline_name + ': %.2f' % (deadline_invest_amount/10000))
+                result_deadline_invest.append(deadline_name + ': %.4f' % (deadline_invest_amount/10000))
         return str(result_deadline_invest)
 
 
@@ -194,17 +191,17 @@ def month_count_main(dept, date):
     if last_month_amount == '0.0':
         investment_growth_rate = '0'
     else:
-        investment_growth_rate = '%.4f%%' % ((float(current_month_amount)-float(last_month_amount))/float(last_month_amount))*100
+        investment_growth_rate = '%.4f%%' % ((float(current_month_amount)-float(last_month_amount))/float(last_month_amount)*100)
     current_month_count = mc.invest_count()
     current_month_performance_amount, last_month_performance_amount = mc.performance_amount()
     if last_month_performance_amount == '0.0':
         performance_growth_rate = '0'
     else:
-        performance_growth_rate = '%.4f%%' % ((float(current_month_performance_amount)-float(last_month_performance_amount))/float(last_month_performance_amount))*100
+        performance_growth_rate = '%.4f%%' % ((float(current_month_performance_amount)-float(last_month_performance_amount))/float(last_month_performance_amount)*100)
     repayed_amount_current_month = mc.repayment_amount_current_month()
     cashout_current_month = mc.cashout_amount()
     if repayed_amount_current_month != '0.0':
-        cashout_proportion_current_month = str('%.2f%%' % eval(cashout_current_month+'/'+repayed_amount_current_month+'*100'))
+        cashout_proportion_current_month = str('%.4f%%' % eval(cashout_current_month+'/'+repayed_amount_current_month+'*100'))
     else:
         cashout_proportion_current_month = '0'
     recharge_current_month = mc.recharge_amount_current_month()

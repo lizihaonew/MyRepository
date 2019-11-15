@@ -59,21 +59,20 @@ class EmployeeCount(Optsql):
 
     def funds_amount(self):
         ''' 客户待收总额、客户沉淀总额 '''
-        asset_funds_to_be_collected_sql = "SELECT SUM(a.funds_to_be_collected) FROM wbs_asset_cus_account a, " \
-                                          "wbs_customer c WHERE c.faId={0} AND a.cus_id=c.id;".format(self.fa_id)
-        asset_precipitated_capital_sql = "SELECT SUM(a.precipitated_capital) FROM wbs_asset_cus_account a, " \
-                                          "wbs_customer c WHERE c.faId={0} AND a.cus_id=c.id;".format(self.fa_id)
-        stock_funds_to_be_collected_sql = "SELECT SUM(funds_to_be_collected) FROM wbs_stock_customer WHERE fa_id={0} " \
-                                          "AND deleted=0;".format(self.fa_id)
-        stock_precipitated_capital_sql = "SELECT SUM(precipitated_capital) FROM wbs_stock_customer WHERE fa_id={0} " \
-                                          "AND deleted=0;".format(self.fa_id)
-        asset_funds_to_be_collected = self.exchange_None(self.execute_select(self.cur,asset_funds_to_be_collected_sql)[0][0])
-        asset_precipitated_capital = self.exchange_None(self.execute_select(self.cur,asset_precipitated_capital_sql)[0][0])
+        # asset_funds_to_be_collected_sql = "SELECT SUM(a.funds_to_be_collected) FROM wbs_asset_cus_account a, " \
+        #                                   "wbs_customer c WHERE c.faId={0} AND a.cus_id=c.id;".format(self.fa_id)
+        # asset_precipitated_capital_sql = "SELECT SUM(a.precipitated_capital) FROM wbs_asset_cus_account a, " \
+        #                                   "wbs_customer c WHERE c.faId={0} AND a.cus_id=c.id;".format(self.fa_id)
+        stock_funds_to_be_collected_sql = "SELECT SUM(funds_to_be_collected) FROM wbs_stock_customer WHERE fa_id={0};".format(self.fa_id)
+        stock_precipitated_capital_sql = "SELECT SUM(precipitated_capital) FROM wbs_stock_customer WHERE fa_id={0};".format(self.fa_id)
+        # asset_funds_to_be_collected = self.exchange_None(self.execute_select(self.cur,asset_funds_to_be_collected_sql)[0][0])
+        # asset_precipitated_capital = self.exchange_None(self.execute_select(self.cur,asset_precipitated_capital_sql)[0][0])
         stock_funds_to_be_collected = self.exchange_None(self.execute_select(self.cur,stock_funds_to_be_collected_sql)[0][0])
         stock_precipitated_capital = self.exchange_None(self.execute_select(self.cur,stock_precipitated_capital_sql)[0][0])
-        funds_to_be_collected = asset_funds_to_be_collected + stock_funds_to_be_collected
-        precipitated_capital = asset_precipitated_capital + stock_precipitated_capital
-        return [str(funds_to_be_collected/10000), str(precipitated_capital/10000)]
+        # funds_to_be_collected = asset_funds_to_be_collected + stock_funds_to_be_collected
+        # precipitated_capital = asset_precipitated_capital + stock_precipitated_capital
+        # return [str(funds_to_be_collected/10000), str(precipitated_capital/10000)]
+        return [str(stock_funds_to_be_collected/10000), str(stock_precipitated_capital/10000)]
 
     def openaccount_amount(self):
         ''' 本日累计开户数、昨日累计开户数 '''
@@ -96,24 +95,32 @@ class EmployeeCount(Optsql):
         return [str(openaccount_amount_today), str(openaccount_amount_yesterday)]
 
     def first_invest_match_count(self):
-        ''' 本月首投达标客户数 '''
+        ''' 本月首投达标客户数、本日累计首投达标客户数'''
         ''' fimc = first_invest_match_count '''
-        month_HY_fimc_sql = "SELECT COUNT(1) FROM (SELECT DISTINCT cus_id FROM `ns_order` WHERE fa_id={0} AND " \
-                            "Convert(trans_time,CHAR(20)) LIKE '{1}%' AND first_invest=1 AND trans_amount>=3000 AND " \
-                            "asset_id=1) a;".format(self.fa_id, self.current_month)
-        month_HJS_fimc_sql = "SELECT COUNT(1) FROM (SELECT DISTINCT cus_id FROM `ns_order` WHERE fa_id={0} AND " \
-                            "Convert(trans_time,CHAR(20)) LIKE '{1}%' AND first_invest=1 AND trans_amount>=20000 AND " \
-                            "asset_id=2) a;".format(self.fa_id, self.current_month)
-        month_HP_fimc_sql = "SELECT COUNT(1) FROM (SELECT DISTINCT cus_id FROM `ns_order` WHERE fa_id={0} AND " \
-                            "Convert(trans_time,CHAR(20)) LIKE '{1}%' AND first_invest=1 AND trans_amount>=20000 AND " \
-                            "asset_id=3) a;".format(self.fa_id, self.current_month)
+        month_HY_fimc_sql = "SELECT COUNT(1) FROM `ns_order` WHERE fa_id={0} AND Convert(trans_time,CHAR(20)) " \
+                            "LIKE '{1}%' AND first_invest=1 AND trans_amount>=3000 AND asset_id=1;".format(self.fa_id, self.current_month)
+        month_HJS_fimc_sql = "SELECT COUNT(1) FROM `ns_order` WHERE fa_id={0} AND Convert(trans_time,CHAR(20)) " \
+                             "LIKE '{1}%' AND first_invest=1 AND trans_amount>=20000 AND asset_id=2;".format(self.fa_id, self.current_month)
+        month_HP_fimc_sql = "SELECT COUNT(1) FROM `ns_order` WHERE fa_id={0} AND Convert(trans_time,CHAR(20)) " \
+                            "LIKE '{1}%' AND first_invest=1 AND trans_amount>=20000 AND asset_id=3;".format(self.fa_id, self.current_month)
+
+        today_HY_fimc_sql = "SELECT COUNT(1) FROM `ns_order` WHERE fa_id={0} AND Convert(trans_time,CHAR(20)) " \
+                            "LIKE '{1}%' AND first_invest=1 AND trans_amount>=3000 AND asset_id=1;".format(self.fa_id, self.today)
+        today_HJS_fimc_sql = "SELECT COUNT(1) FROM `ns_order` WHERE fa_id={0} AND Convert(trans_time,CHAR(20)) " \
+                             "LIKE '{1}%' AND first_invest=1 AND trans_amount>=20000 AND asset_id=2;".format(self.fa_id, self.today)
+        today_HP_fimc_sql = "SELECT COUNT(1) FROM `ns_order` WHERE fa_id={0} AND Convert(trans_time,CHAR(20)) " \
+                            "LIKE '{1}%' AND first_invest=1 AND trans_amount>=20000 AND asset_id=3;".format(self.fa_id, self.today)
 
         month_HY_fimc = self.exchange_None(self.execute_select(self.cur, month_HY_fimc_sql)[0][0])
         month_HJS_fimc = self.exchange_None(self.execute_select(self.cur, month_HJS_fimc_sql)[0][0])
         month_HP_fimc = self.exchange_None(self.execute_select(self.cur, month_HP_fimc_sql)[0][0])
         month_fimc = month_HY_fimc + month_HJS_fimc + month_HP_fimc
 
-        return str(month_fimc)
+        today_HY_fimc = self.exchange_None(self.execute_select(self.cur, today_HY_fimc_sql)[0][0])
+        today_HJS_fimc = self.exchange_None(self.execute_select(self.cur, today_HJS_fimc_sql)[0][0])
+        today_HP_fimc = self.exchange_None(self.execute_select(self.cur, today_HP_fimc_sql)[0][0])
+        today_fimc = today_HY_fimc + today_HJS_fimc + today_HP_fimc
+        return [str(month_fimc),str(today_fimc)]
 
 
 def employee_count_main(mobile):
@@ -124,7 +131,7 @@ def employee_count_main(mobile):
     today_count, yesterday_count = ec.invest_count()
     funds_to_be_collected, precipitated_capital = ec.funds_amount()
     openaccount_amount_today, openaccount_amount_yesterday = ec.openaccount_amount()
-    month_fimc = ec.first_invest_match_count()
+    month_fimc, today_fimc = ec.first_invest_match_count()
 
 
     comment = '销售快报 - 按照员工统计，统计结果如下：' + '( 员工：%s, 手机号：%s，部门：%s )' % (employee_name, employee_mobile, employee_dept) + '\n' \
@@ -137,10 +144,11 @@ def employee_count_main(mobile):
         '客户沉淀总额：' + precipitated_capital + '\n' \
         '本日累计开户数：' + openaccount_amount_today + '\n' \
         '昨日累计开户数：' + openaccount_amount_yesterday + '\n' \
-        '本月首投达标客户数：' + month_fimc
+        '本月首投达标客户数：' + month_fimc + '\n' \
+        '本日累计首投达标客户数：' + today_fimc
 
     print(comment)
 
 
 if __name__ == '__main__':
-    employee_count_main('13666666661')
+    employee_count_main('16666666666')
