@@ -55,7 +55,7 @@ class DeptCount(Optsql):
 
         yesterday_amount = self.exchange_None(self.execute_select(self.cur,yesterday_amount_sql)[0][0])
 
-        return [str(today_amount), str(yesterday_amount)]
+        return [str(today_amount/10000), str(yesterday_amount/10000)]
 
     def yesterday_performance_amount(self):
         '''昨日投资业绩'''
@@ -64,7 +64,7 @@ class DeptCount(Optsql):
                               ";".format(self.yesterday, self.dept, self.asset_sql)
         yesterday_amount = self.exchange_None(self.execute_select(self.cur,yesterday_amount_sql)[0][0])
 
-        return str(yesterday_amount)
+        return str(yesterday_amount/10000)
 
     def invest_count(self):
         '''本日投资笔数、昨日投资笔数'''
@@ -78,64 +78,77 @@ class DeptCount(Optsql):
 
     def repayment_amount(self):
         '''本月累计已还款、本月累计待还款'''
-        repayed_amount_sql = "SELECT SUM(actual_exit_amount) FROM `wbs_received_payment` WHERE Convert(actual_exit_time,CHAR(20)) " \
-                            "LIKE '{0}%' AND STATUS = 1 AND dept_code LIKE '{1}%' AND order_no " \
-                            "IN (SELECT order_no FROM `ns_order` WHERE 1=1 " \
-                            "{2});".format(self.current_month, self.dept, self.asset_sql)
-        expected_amount_sql = "SELECT SUM(expected_exit_amount) FROM `wbs_received_payment` WHERE Convert(expected_exit_time,CHAR(20)) " \
-                            "LIKE '{0}%' AND STATUS = 2 AND dept_code LIKE '{1}%' AND order_no " \
-                            "IN (SELECT order_no FROM `ns_order` WHERE 1=1 " \
-                            "{2});".format(self.current_month, self.dept, self.asset_sql)
-
+        if self.asset == 0:
+            repayed_amount_sql = "SELECT SUM(actual_exit_amount) FROM `wbs_received_payment` WHERE Convert(actual_exit_time,CHAR(20)) " \
+                                 "LIKE '{0}%' AND STATUS = 2 AND dept_code LIKE '{1}%';".format(self.current_month, self.dept)
+            expected_amount_sql = "SELECT SUM(expected_exit_amount) FROM `wbs_received_payment` WHERE Convert(expected_exit_time,CHAR(20)) " \
+                                  "LIKE '{0}%' AND STATUS = 1 AND dept_code LIKE '{1}%';".format(self.current_month, self.dept)
+        else:
+            repayed_amount_sql = "SELECT SUM(actual_exit_amount) FROM `wbs_received_payment` WHERE Convert(actual_exit_time,CHAR(20)) " \
+                                "LIKE '{0}%' AND STATUS = 2 AND dept_code LIKE '{1}%' AND order_no " \
+                                "IN (SELECT order_no FROM `ns_order` WHERE 1=1 " \
+                                "{2});".format(self.current_month, self.dept, self.asset_sql)
+            expected_amount_sql = "SELECT SUM(expected_exit_amount) FROM `wbs_received_payment` WHERE Convert(expected_exit_time,CHAR(20)) " \
+                                "LIKE '{0}%' AND STATUS = 1 AND dept_code LIKE '{1}%' AND order_no " \
+                                "IN (SELECT order_no FROM `ns_order` WHERE 1=1 " \
+                                "{2});".format(self.current_month, self.dept, self.asset_sql)
+        # print("本月累计已还款:" + repayed_amount_sql)
+        # print("本月累计待还款:" + expected_amount_sql)
         repayed_amount = self.exchange_None(self.execute_select(self.cur,repayed_amount_sql)[0][0])
         expected_amount = self.exchange_None(self.execute_select(self.cur,expected_amount_sql)[0][0])
-        return [str(repayed_amount), str(expected_amount)]
+        return [str(repayed_amount/10000), str(expected_amount/10000)]
 
     def cashout_amount(self):
         ''' 本月累计提现、本日累计提现、昨日累计提现 '''
-        cashout_current_month_sql = "SELECT SUM(cashout_amount) FROM `ns_cashout_record` WHERE 1=1 AND Convert(cashout_time,CHAR(20)) " \
+        cashout_current_month_sql = "SELECT SUM(cashout_amount) FROM `ns_cashout_record` WHERE 1=1 AND STATUS=3 AND Convert(cashout_time,CHAR(20)) " \
                                     "LIKE '{0}%' AND dept_code LIKE " \
                                     "'{1}%' {2}".format(self.current_month, self.dept, self.asset_sql)
-
-        cashout_today_sql = "SELECT SUM(cashout_amount) FROM `ns_cashout_record` WHERE 1=1 AND Convert(cashout_time,CHAR(20)) " \
+        cashout_today_sql = "SELECT SUM(cashout_amount) FROM `ns_cashout_record` WHERE 1=1 AND STATUS=3 AND Convert(cashout_time,CHAR(20)) " \
                                     "LIKE '{0}%' AND dept_code LIKE " \
                                     "'{1}%' {2}".format(self.today, self.dept, self.asset_sql)
-        cashout_yesterday_sql = "SELECT SUM(cashout_amount) FROM `ns_cashout_record` WHERE 1=1 AND Convert(cashout_time,CHAR(20)) " \
+        cashout_yesterday_sql = "SELECT SUM(cashout_amount) FROM `ns_cashout_record` WHERE 1=1 AND STATUS=3 AND Convert(cashout_time,CHAR(20)) " \
                                     "LIKE '{0}%' AND dept_code LIKE " \
                                     "'{1}%' {2}".format(self.yesterday, self.dept, self.asset_sql)
         cashout_current_month = self.exchange_None(self.execute_select(self.cur,cashout_current_month_sql)[0][0])
         cashout_today = self.exchange_None(self.execute_select(self.cur,cashout_today_sql)[0][0])
         cashout_yesterday = self.exchange_None(self.execute_select(self.cur,cashout_yesterday_sql)[0][0])
-        return [str(cashout_current_month), str(cashout_today), str(cashout_yesterday)]
+        return [str(cashout_current_month/10000), str(cashout_today/10000), str(cashout_yesterday/10000)]
 
     def exit_amount(self):
         ''' 当日实际回款总额、昨日实际回款总额 '''
-        exit_amount_today_sql = "SELECT SUM(actual_exit_amount) FROM `wbs_received_payment` WHERE Convert(actual_exit_time,CHAR(20)) " \
-                            "LIKE '{0}%' AND STATUS = 1 AND dept_code LIKE '{1}%' AND order_no IN " \
-                            "(SELECT order_no FROM `ns_order` WHERE 1=1 {2});".format(self.today, self.dept, self.asset_sql)
-        exit_amount_yesterday_sql = "SELECT SUM(actual_exit_amount) FROM `wbs_received_payment` WHERE Convert(actual_exit_time,CHAR(20)) " \
-                            "LIKE '{0}%' AND STATUS = 1 AND dept_code LIKE '{1}%' AND order_no IN " \
-                            "(SELECT order_no FROM `ns_order` WHERE 1=1 {2});".format(self.yesterday, self.dept, self.asset_sql)
+        if self.asset == 0:
+            exit_amount_today_sql = "SELECT SUM(actual_exit_amount) FROM `wbs_received_payment` WHERE Convert(actual_exit_time,CHAR(20)) " \
+                                    "LIKE '{0}%' AND STATUS = 2 AND dept_code LIKE '{1}%';".format(self.today, self.dept)
+            exit_amount_yesterday_sql = "SELECT SUM(actual_exit_amount) FROM `wbs_received_payment` WHERE Convert(actual_exit_time,CHAR(20)) " \
+                                        "LIKE '{0}%' AND STATUS = 2 AND dept_code LIKE '{1}%';".format(self.yesterday, self.dept)
+        else:
+            exit_amount_today_sql = "SELECT SUM(actual_exit_amount) FROM `wbs_received_payment` WHERE Convert(actual_exit_time,CHAR(20)) " \
+                                "LIKE '{0}%' AND STATUS = 2 AND dept_code LIKE '{1}%' AND order_no IN " \
+                                "(SELECT order_no FROM `ns_order` WHERE 1=1 {2});".format(self.today, self.dept, self.asset_sql)
+            exit_amount_yesterday_sql = "SELECT SUM(actual_exit_amount) FROM `wbs_received_payment` WHERE Convert(actual_exit_time,CHAR(20)) " \
+                                "LIKE '{0}%' AND STATUS = 2 AND dept_code LIKE '{1}%' AND order_no IN " \
+                                "(SELECT order_no FROM `ns_order` WHERE 1=1 {2});".format(self.yesterday, self.dept, self.asset_sql)
+        # print('当日实际回款总额: ' + exit_amount_today_sql)
+        # print('昨日实际回款总额: ' + exit_amount_yesterday_sql)
         exit_amount_today = self.exchange_None(self.execute_select(self.cur,exit_amount_today_sql)[0][0])
         exit_amount_yesterday = self.exchange_None(self.execute_select(self.cur,exit_amount_yesterday_sql)[0][0])
-        return [str(exit_amount_today), str(exit_amount_yesterday)]
+        return [str(exit_amount_today/10000), str(exit_amount_yesterday/10000)]
 
     def recharge_amount(self):
         ''' 本月累计充值、本日累计充值、昨日累计充值 '''
-        recharge_current_month_sql = "SELECT SUM(recharge_amount) FROM `ns_recharge_record` WHERE 1=1 AND Convert(recharge_time,CHAR(20)) " \
+        recharge_current_month_sql = "SELECT SUM(recharge_amount) FROM `ns_recharge_record` WHERE 1=1 AND STATUS=3 AND Convert(recharge_time,CHAR(20)) " \
                                     "LIKE '{0}%' AND dept_code LIKE " \
                                     "'{1}%' {2}".format(self.current_month, self.dept, self.asset_sql)
-
-        recharge_today_sql = "SELECT SUM(recharge_amount) FROM `ns_recharge_record` WHERE 1=1 AND Convert(recharge_time,CHAR(20)) " \
+        recharge_today_sql = "SELECT SUM(recharge_amount) FROM `ns_recharge_record` WHERE 1=1 AND STATUS=3 AND Convert(recharge_time,CHAR(20)) " \
                             "LIKE '{0}%' AND dept_code LIKE " \
                             "'{1}%' {2}".format(self.today, self.dept, self.asset_sql)
-        recharge_yesterday_sql = "SELECT SUM(recharge_amount) FROM `ns_recharge_record` WHERE 1=1 AND Convert(recharge_time,CHAR(20)) " \
+        recharge_yesterday_sql = "SELECT SUM(recharge_amount) FROM `ns_recharge_record` WHERE 1=1 AND STATUS=3 AND Convert(recharge_time,CHAR(20)) " \
                                 "LIKE '{0}%' AND dept_code LIKE " \
                                 "'{1}%' {2}".format(self.yesterday, self.dept, self.asset_sql)
         recharge_current_month = self.exchange_None(self.execute_select(self.cur,recharge_current_month_sql)[0][0])
         recharge_today = self.exchange_None(self.execute_select(self.cur,recharge_today_sql)[0][0])
         recharge_yesterday = self.exchange_None(self.execute_select(self.cur,recharge_yesterday_sql)[0][0])
-        return [str(recharge_current_month), str(recharge_today), str(recharge_yesterday)]
+        return [str(recharge_current_month/10000), str(recharge_today/10000), str(recharge_yesterday/10000)]
 
     def funds_amount(self):
         ''' 客户待收总额、客户沉淀总额 '''
@@ -144,24 +157,32 @@ class DeptCount(Optsql):
         else:
             self.asset_sql1 = 'and asset = %s' % str(self.asset)
 
-        asset_funds_to_be_collected_sql = "SELECT SUM(funds_to_be_collected) FROM `wbs_asset_cus_account` WHERE 1=1 " \
-                                          "AND cus_id IN (SELECT id FROM `wbs_customer` WHERE deptCode LIKE " \
-                                          "'{0}%') {1};".format(self.dept, self.asset_sql1)
-        asset_precipitated_capital_sql = "SELECT SUM(precipitated_capital) FROM `wbs_asset_cus_account` WHERE 1=1 " \
-                                          "AND cus_id IN (SELECT id FROM `wbs_customer` WHERE deptCode LIKE " \
-                                          "'{0}%') {1};".format(self.dept, self.asset_sql1)
+        # asset_funds_to_be_collected_sql = "SELECT SUM(funds_to_be_collected) FROM `wbs_asset_cus_account` WHERE 1=1 " \
+        #                                   "AND cus_id IN (SELECT id FROM `wbs_customer` WHERE deptCode LIKE " \
+        #                                   "'{0}%') {1};".format(self.dept, self.asset_sql1)
+        # asset_precipitated_capital_sql = "SELECT SUM(precipitated_capital) FROM `wbs_asset_cus_account` WHERE 1=1 " \
+        #                                   "AND cus_id IN (SELECT id FROM `wbs_customer` WHERE deptCode LIKE " \
+        #                                   "'{0}%') {1};".format(self.dept, self.asset_sql1)
+        # stock_funds_to_be_collected_sql = "SELECT SUM(funds_to_be_collected) FROM `wbs_stock_customer` WHERE 1=1 " \
+        #                                  "AND dept_code LIKE '{0}%' AND deleted=0 {1};".format(self.dept, self.asset_sql1)
+        # stock_precipitated_capital_sql = "SELECT SUM(precipitated_capital) FROM `wbs_stock_customer` WHERE 1=1 " \
+        #                                  "AND dept_code LIKE '{0}%' AND deleted=0 {1};".format(self.dept, self.asset_sql1)
         stock_funds_to_be_collected_sql = "SELECT SUM(funds_to_be_collected) FROM `wbs_stock_customer` WHERE 1=1 " \
-                                         "AND dept_code LIKE '{0}%' AND deleted=0 {1};".format(self.dept, self.asset_sql1)
+                                         "AND dept_code LIKE '{0}%' AND create_time IS NOT NULL {1};".format(self.dept, self.asset_sql1)
         stock_precipitated_capital_sql = "SELECT SUM(precipitated_capital) FROM `wbs_stock_customer` WHERE 1=1 " \
-                                         "AND dept_code LIKE '{0}%' AND deleted=0 {1};".format(self.dept, self.asset_sql1)
-
-        asset_funds_to_be_collected = self.exchange_None(self.execute_select(self.cur,asset_funds_to_be_collected_sql)[0][0])
-        asset_precipitated_capital = self.exchange_None(self.execute_select(self.cur,asset_precipitated_capital_sql)[0][0])
-        stock_funds_to_be_collected = self.exchange_None(self.execute_select(self.cur,stock_funds_to_be_collected_sql)[0][0])
-        stock_precipitated_capital = self.exchange_None(self.execute_select(self.cur,stock_precipitated_capital_sql)[0][0])
-        funds_to_be_collected = asset_funds_to_be_collected + stock_funds_to_be_collected
-        precipitated_capital = asset_precipitated_capital + stock_precipitated_capital
-        return [str(funds_to_be_collected), str(precipitated_capital)]
+                                         "AND dept_code LIKE '{0}%' AND create_time IS NOT NULL {1};".format(self.dept, self.asset_sql1)
+        # print("asset待收：" + asset_funds_to_be_collected_sql)
+        # print("asset沉淀：" + asset_precipitated_capital_sql)
+        # print("stock待收：" + stock_funds_to_be_collected_sql)
+        # print("stock待收：" + stock_precipitated_capital_sql)
+        # asset_funds_to_be_collected = self.exchange_None(self.execute_select(self.cur,asset_funds_to_be_collected_sql)[0][0])
+        # asset_precipitated_capital = self.exchange_None(self.execute_select(self.cur,asset_precipitated_capital_sql)[0][0])
+        stock_funds_to_be_collected = self.exchange_None(self.execute_select(self.cur, stock_funds_to_be_collected_sql)[0][0])
+        stock_precipitated_capital = self.exchange_None(self.execute_select(self.cur, stock_precipitated_capital_sql)[0][0])
+        # funds_to_be_collected = asset_funds_to_be_collected + stock_funds_to_be_collected
+        # precipitated_capital = asset_precipitated_capital + stock_precipitated_capital
+        # return [str(funds_to_be_collected/10000), str(precipitated_capital/10000)]
+        return [str(stock_funds_to_be_collected/10000), str(stock_precipitated_capital/10000)]
 
     def openaccount_amount(self):
         ''' 本日累计开户数、昨日累计开户数 '''
@@ -197,26 +218,22 @@ class DeptCount(Optsql):
     def first_invest_match_count(self):
         ''' 本月累计首投达标客户数、本日累计首投达标客户数 '''
         ''' fimc = first_invest_match_count '''
-        month_HY_fimc_sql = "SELECT COUNT(1) FROM (SELECT DISTINCT cus_id FROM `ns_order` WHERE Convert(trans_time,CHAR(20)) LIKE '{0}%'" \
-                        " AND first_invest=1 AND dept_code LIKE '{1}%' AND asset_id=1 AND trans_amount>=3000) " \
-                        "s;".format(self.current_month, self.dept)
-        month_HJS_fimc_sql = "SELECT COUNT(1) FROM (SELECT DISTINCT cus_id FROM `ns_order` WHERE Convert(trans_time,CHAR(20)) LIKE '{0}%'" \
-                        " AND first_invest=1 AND dept_code LIKE '{1}%' AND asset_id=2 AND trans_amount>=20000) " \
-                        "s;".format(self.current_month, self.dept)
-        month_HP_fimc_sql = "SELECT COUNT(1) FROM (SELECT DISTINCT cus_id FROM `ns_order` WHERE Convert(trans_time,CHAR(20)) LIKE '{0}%'" \
-                        " AND first_invest=1 AND dept_code LIKE '{1}%' AND asset_id=3 AND trans_amount>=20000) " \
-                        "s;".format(self.current_month, self.dept)
+        month_HY_fimc_sql = "SELECT COUNT(1) FROM `ns_order` WHERE Convert(trans_time,CHAR(20)) LIKE '{0}%'" \
+                        " AND first_invest=1 AND dept_code LIKE '{1}%' AND asset_id=1 AND trans_amount>=3000;".format(self.current_month, self.dept)
+        month_HJS_fimc_sql = "SELECT COUNT(1) FROM `ns_order` WHERE Convert(trans_time,CHAR(20)) LIKE '{0}%'" \
+                        " AND first_invest=1 AND dept_code LIKE '{1}%' AND asset_id=2 AND trans_amount>=20000;".format(self.current_month, self.dept)
+        month_HP_fimc_sql = "SELECT COUNT(1) FROM `ns_order` WHERE Convert(trans_time,CHAR(20)) LIKE '{0}%'" \
+                        " AND first_invest=1 AND dept_code LIKE '{1}%' AND asset_id=3 AND trans_amount>=20000;".format(self.current_month, self.dept)
 
-        today_HY_fimc_sql = "SELECT COUNT(1) FROM (SELECT DISTINCT cus_id FROM `ns_order` WHERE Convert(trans_time,CHAR(20)) LIKE '{0}%'" \
-                        " AND first_invest=1 AND dept_code LIKE '{1}%' AND asset_id=1 AND trans_amount>=3000) " \
-                        "s;".format(self.today, self.dept)
-        today_HJS_fimc_sql = "SELECT COUNT(1) FROM (SELECT DISTINCT cus_id FROM `ns_order` WHERE Convert(trans_time,CHAR(20)) LIKE '{0}%'" \
-                        " AND first_invest=1 AND dept_code LIKE '{1}%' AND asset_id=2 AND trans_amount>=20000) " \
-                        "s;".format(self.today, self.dept)
-        today_HP_fimc_sql = "SELECT COUNT(1) FROM (SELECT DISTINCT cus_id FROM `ns_order` WHERE Convert(trans_time,CHAR(20)) LIKE '{0}%'" \
-                        " AND first_invest=1 AND dept_code LIKE '{1}%' AND asset_id=3 AND trans_amount>=20000) " \
-                        "s;".format(self.today, self.dept)
-
+        today_HY_fimc_sql = "SELECT COUNT(1) FROM `ns_order` WHERE Convert(trans_time,CHAR(20)) LIKE '{0}%'" \
+                        " AND first_invest=1 AND dept_code LIKE '{1}%' AND asset_id=1 AND trans_amount>=3000;".format(self.today, self.dept)
+        today_HJS_fimc_sql = "SELECT COUNT(1) FROM `ns_order` WHERE Convert(trans_time,CHAR(20)) LIKE '{0}%'" \
+                        " AND first_invest=1 AND dept_code LIKE '{1}%' AND asset_id=2 AND trans_amount>=20000;".format(self.today, self.dept)
+        today_HP_fimc_sql = "SELECT COUNT(1) FROM `ns_order` WHERE Convert(trans_time,CHAR(20)) LIKE '{0}%'" \
+                        " AND first_invest=1 AND dept_code LIKE '{1}%' AND asset_id=3 AND trans_amount>=20000;".format(self.today, self.dept)
+        # print('month_HY_fimc_sql: '+ month_HY_fimc_sql)
+        # print('month_HJS_fimc_sql: '+ month_HY_fimc_sql)
+        # print('month_HP_fimc_sql: '+ month_HY_fimc_sql)
         month_HY_fimc = self.exchange_None(self.execute_select(self.cur, month_HY_fimc_sql)[0][0])
         month_HJS_fimc = self.exchange_None(self.execute_select(self.cur, month_HJS_fimc_sql)[0][0])
         month_HP_fimc = self.exchange_None(self.execute_select(self.cur, month_HP_fimc_sql)[0][0])
@@ -252,7 +269,9 @@ class DeptCount(Optsql):
             # print([product_type_name_sql,invest_amount_today_sql])
             product_type_name = self.execute_select(self.cur, product_type_name_sql)[0][0]
             product_type_invest_amount = self.exchange_None(self.execute_select(self.cur, invest_amount_today_sql)[0][0])
-            result_product_type_invest.append((product_type_name+':%s' % str(id), '%.2f'% product_type_invest_amount))
+            if not product_type_invest_amount:
+                continue
+            result_product_type_invest.append((product_type_name+':%s' % str(id), '%.4f'% (product_type_invest_amount/10000)))
         return str(result_product_type_invest)
 
     def deadline_num_invest_amount(self):
@@ -277,7 +296,9 @@ class DeptCount(Optsql):
                 # print([product_type_name_sql,invest_amount_today_sql])
                 deadline_name = '{0}{1}'.format(str(num), unit_name)
                 deadline_invest_amount = self.exchange_None(self.execute_select(self.cur, invest_amount_today_sql)[0][0])
-                result_deadline_invest.append(deadline_name + ': %.2f' % deadline_invest_amount)
+                if not deadline_invest_amount:
+                    continue
+                result_deadline_invest.append(deadline_name + ': %.4f' % (deadline_invest_amount/10000))
         return str(result_deadline_invest)
 
 
@@ -290,23 +311,24 @@ def dept_count_main(dept, asset):
     current_month_actual_exit_amount, current_month_expected_exit_amount = dc.repayment_amount()
     cashout_current_month,cashout_today,cashout_yesterday = dc.cashout_amount()
     exit_amount_today,exit_amount_yesterday = dc.exit_amount()
-    if exit_amount_today != '0':
-        cashout_proportion_today = str('%.2f%%' % eval(cashout_today+'/'+exit_amount_today))
+
+    if exit_amount_today != '0.0':
+        cashout_proportion_today = str('%.2f%%' % eval(cashout_today+'/'+exit_amount_today+'*100'))
     else:
         cashout_proportion_today = '0'
 
-    if exit_amount_yesterday != '0':
-        cashout_proportion_yesterday = str('%.2f%%' % eval(cashout_yesterday+'/'+exit_amount_yesterday))
+    if exit_amount_yesterday != '0.0':
+        cashout_proportion_yesterday = str('%.2f%%' % eval(cashout_yesterday+'/'+exit_amount_yesterday+'*100'))
     else:
         cashout_proportion_yesterday = '0'
     recharge_current_month,recharge_today,recharge_yesterday = dc.recharge_amount()
-    if today_amount != '0':
-        recharge_proportion_today = str('%.2f%%' % eval(recharge_today+'/'+today_amount))
+    if today_amount != '0.0':
+        recharge_proportion_today = str('%.2f%%' % eval(recharge_today+'/'+today_amount+'*100'))
     else:
         recharge_proportion_today = '0'
     repay_investor_today = str(eval(today_amount+'-'+recharge_today))
-    if today_amount != '0':
-        repay_investor_proportion_today = str('%.2f%%' % eval(repay_investor_today+'/'+today_amount))
+    if today_amount != '0.0':
+        repay_investor_proportion_today = str('%.2f%%' % eval(repay_investor_today+'/'+today_amount + '*100'))
     else:
         repay_investor_proportion_today = '0'
     net_amount_today = str(eval(recharge_today+'-'+cashout_today))
@@ -381,8 +403,8 @@ def dept_count_main(dept, asset):
 
 
 if __name__ == '__main__':
-    # dept_count_main('SHNMCW0002'，0)
-    dept_count_main('SHNMCW0002', 3)
+    dept_count_main('SHNMZX000100010001000100010001', 0)
+    # dept_count_main('SHNMCW0002', 3)
     # dcc = DeptCount('SHNMCW0002', 3)
     # print(dcc.type_invest_amount())
 

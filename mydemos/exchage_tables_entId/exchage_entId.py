@@ -15,11 +15,11 @@
 import pymysql
 
 ###############################
-host = '192.168.47.133'
-username = 'root'
-password = '123456'
-db = 'wbs_pri'
-new_entId = '888'
+host = 'rm-2ze3r058ks9ibbvnfqo.mysql.rds.aliyuncs.com'
+username = 'wbs'
+password = 'NTBnami201904!'
+db = 'wbs-sec'
+new_entId = '8001'
 ################################
 
 
