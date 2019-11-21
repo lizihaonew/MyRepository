@@ -61,6 +61,8 @@ class UpdateTableTime(Optsql):
         stock_customer_yesterday_sql = "UPDATE wbs_stock_customer SET platform_account_opening_time='{0} 00:00:00'" \
                                        " WHERE platform_account_opening_time LIKE '{1}%'" \
                                        ";".format(self.yesterday, self.two_days_ago)
+        stock_create_time_today_sql = "UPDATE wbs_stock_customer SET create_time='{0} 00:00:00' " \
+                                   "WHERE create_time LIKE '{1}%';".format(self.today, self.yesterday)
 
         res = self.update_table(ns_order_today_sql)
         print('%s update successful!!!' % 'ns_order_today_sql' + '===' + str(res))
@@ -94,11 +96,13 @@ class UpdateTableTime(Optsql):
         print('%s update successful!!!' % 'stock_customer_today_sql' + '===' + str(res))
         res = self.update_table(stock_customer_yesterday_sql)
         print('%s update successful!!!' % 'stock_customer_yesterday_sql' + '===' + str(res))
+        res = self.update_table(stock_create_time_today_sql)
+        print('%s update successful!!!' % 'stock_create_time_today_sql' + '===' + str(res))
 
 
 if __name__ == '__main__':
     utt = UpdateTableTime('0')
-    # utt = UpdateTableTime('2019-11-01')
+    # utt = UpdateTableTime('2019-11-15')
     utt.update_table_time()
 
 

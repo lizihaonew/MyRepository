@@ -16,7 +16,7 @@ from month_count import month_count_main
 # ribao = 销售日报  SHNMCW0002  2019-11-01
 # yuebao = 销售月报 SHNMCW0002  2019-11
 
-count_type = 'ribao'
+count_type = 'bumen'
 # #########################
 
 

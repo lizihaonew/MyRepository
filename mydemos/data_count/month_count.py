@@ -13,6 +13,7 @@ class MonthCount(Optsql):
     def __init__(self, dept, date):
         self.dept = dept
         self.cur = self.conn_mysql()
+        self.sm_cur = self.conn_sm_mysql()
         date_today = datetime.date.today()
         self.today = str(date_today)
         self.yesterday = str(date_today - datetime.timedelta(days=1))
@@ -92,26 +93,36 @@ class MonthCount(Optsql):
         recharge_current_month = self.exchange_None(self.execute_select(self.cur, recharge_current_month_sql)[0][0])
         return str(recharge_current_month/10000)
 
+    # def funds_amount(self):
+    #     ''' 当月待收总额、当月沉淀总额 '''
+    #     asset_funds_to_be_collected_sql = "SELECT SUM(a.funds_to_be_collected) FROM `wbs_asset_cus_account` a, " \
+    #                                       "`wbs_customer` c WHERE c.`deptCode` LIKE '{0}%' AND Convert(a.update_time,CHAR(20))" \
+    #                                       " LIKE '{1}%' AND a.`cus_id`=c.`id`;".format(self.dept, self.current_month)
+    #     asset_precipitated_capital_sql = "SELECT SUM(a.precipitated_capital) FROM `wbs_asset_cus_account` a, " \
+    #                                       "`wbs_customer` c WHERE c.`deptCode` LIKE '{0}%' AND Convert(a.update_time,CHAR(20))" \
+    #                                       " LIKE '{1}%' AND a.`cus_id`=c.`id`;".format(self.dept, self.current_month)
+    #     stock_funds_to_be_collected_sql = "SELECT SUM(funds_to_be_collected) FROM `wbs_stock_customer` WHERE dept_code" \
+    #                                       " LIKE '{0}%' AND deleted=0 AND Convert(update_time,CHAR(20)) LIKE '{1}%';".format(self.dept, self.current_month)
+    #     stock_precipitated_capital_sql = "SELECT SUM(precipitated_capital) FROM `wbs_stock_customer` WHERE dept_code" \
+    #                                       " LIKE '{0}%' AND deleted=0 AND Convert(update_time,CHAR(20)) LIKE '{1}%';".format(self.dept, self.current_month)
+    #
+    #     asset_funds_to_be_collected = self.exchange_None(self.execute_select(self.cur,asset_funds_to_be_collected_sql)[0][0])
+    #     asset_precipitated_capital = self.exchange_None(self.execute_select(self.cur,asset_precipitated_capital_sql)[0][0])
+    #     stock_funds_to_be_collected = self.exchange_None(self.execute_select(self.cur,stock_funds_to_be_collected_sql)[0][0])
+    #     stock_precipitated_capital = self.exchange_None(self.execute_select(self.cur,stock_precipitated_capital_sql)[0][0])
+    #     funds_to_be_collected = asset_funds_to_be_collected + stock_funds_to_be_collected
+    #     precipitated_capital = asset_precipitated_capital + stock_precipitated_capital
+    #     return [str(funds_to_be_collected/10000), str(precipitated_capital/10000)]
+
     def funds_amount(self):
         ''' 当月待收总额、当月沉淀总额 '''
-        asset_funds_to_be_collected_sql = "SELECT SUM(a.funds_to_be_collected) FROM `wbs_asset_cus_account` a, " \
-                                          "`wbs_customer` c WHERE c.`deptCode` LIKE '{0}%' AND Convert(a.update_time,CHAR(20))" \
-                                          " LIKE '{1}%' AND a.`cus_id`=c.`id`;".format(self.dept, self.current_month)
-        asset_precipitated_capital_sql = "SELECT SUM(a.precipitated_capital) FROM `wbs_asset_cus_account` a, " \
-                                          "`wbs_customer` c WHERE c.`deptCode` LIKE '{0}%' AND Convert(a.update_time,CHAR(20))" \
-                                          " LIKE '{1}%' AND a.`cus_id`=c.`id`;".format(self.dept, self.current_month)
-        stock_funds_to_be_collected_sql = "SELECT SUM(funds_to_be_collected) FROM `wbs_stock_customer` WHERE dept_code" \
-                                          " LIKE '{0}%' AND deleted=0 AND Convert(update_time,CHAR(20)) LIKE '{1}%';".format(self.dept, self.current_month)
-        stock_precipitated_capital_sql = "SELECT SUM(precipitated_capital) FROM `wbs_stock_customer` WHERE dept_code" \
-                                          " LIKE '{0}%' AND deleted=0 AND Convert(update_time,CHAR(20)) LIKE '{1}%';".format(self.dept, self.current_month)
-
-        asset_funds_to_be_collected = self.exchange_None(self.execute_select(self.cur,asset_funds_to_be_collected_sql)[0][0])
-        asset_precipitated_capital = self.exchange_None(self.execute_select(self.cur,asset_precipitated_capital_sql)[0][0])
-        stock_funds_to_be_collected = self.exchange_None(self.execute_select(self.cur,stock_funds_to_be_collected_sql)[0][0])
-        stock_precipitated_capital = self.exchange_None(self.execute_select(self.cur,stock_precipitated_capital_sql)[0][0])
-        funds_to_be_collected = asset_funds_to_be_collected + stock_funds_to_be_collected
-        precipitated_capital = asset_precipitated_capital + stock_precipitated_capital
-        return [str(funds_to_be_collected/10000), str(precipitated_capital/10000)]
+        stock_funds_to_be_collected_sql = "SELECT fundsToBeCollected FROM `data_statistics_month` WHERE deptCode" \
+                                          " LIKE '{0}%' AND month LIKE '{1}%';".format(self.dept, self.current_month)
+        stock_precipitated_capital_sql = "SELECT precipitatedCapital FROM `data_statistics_month` WHERE deptCode" \
+                                          " LIKE '{0}%' AND month LIKE '{1}%';".format(self.dept, self.current_month)
+        stock_funds_to_be_collected = self.exchange_None(self.execute_select(self.sm_cur, stock_funds_to_be_collected_sql)[0][0])
+        stock_precipitated_capital = self.exchange_None(self.execute_select(self.sm_cur, stock_precipitated_capital_sql)[0][0])
+        return [str(stock_funds_to_be_collected/10000), str(stock_precipitated_capital/10000)]
 
     def openaccount_amount(self):
         ''' 当月开户客户数 '''
@@ -220,6 +231,9 @@ def month_count_main(dept, date):
     current_month_fimc = mc.first_invest_match_count()
     result_product_type_invest = mc.type_invest_amount()
     result_deadline_invest = mc.deadline_num_invest_amount()
+
+    mc.object_close()
+    mc.object_sm_close()
 
     comment = '销售日报，统计结果如下：' + '( 部门：%s, 搜索日期：%s )' % (dept_name, the_month) + '\n' \
         '当月投资总额：' + current_month_amount + '\n' \
