@@ -128,8 +128,7 @@ class DeptCount(Optsql):
             exit_amount_yesterday_sql = "SELECT SUM(actual_exit_amount) FROM `wbs_received_payment` WHERE Convert(actual_exit_time,CHAR(20)) " \
                                 "LIKE '{0}%' AND STATUS = 2 AND dept_code LIKE '{1}%' AND order_no IN " \
                                 "(SELECT order_no FROM `ns_order` WHERE 1=1 {2});".format(self.yesterday, self.dept, self.asset_sql)
-        # print('当日实际回款总额: ' + exit_amount_today_sql)
-        # print('昨日实际回款总额: ' + exit_amount_yesterday_sql)
+
         exit_amount_today = self.exchange_None(self.execute_select(self.cur,exit_amount_today_sql)[0][0])
         exit_amount_yesterday = self.exchange_None(self.execute_select(self.cur,exit_amount_yesterday_sql)[0][0])
         return [str(exit_amount_today/10000), str(exit_amount_yesterday/10000)]
@@ -157,31 +156,13 @@ class DeptCount(Optsql):
         else:
             self.asset_sql1 = 'and asset = %s' % str(self.asset)
 
-        # asset_funds_to_be_collected_sql = "SELECT SUM(funds_to_be_collected) FROM `wbs_asset_cus_account` WHERE 1=1 " \
-        #                                   "AND cus_id IN (SELECT id FROM `wbs_customer` WHERE deptCode LIKE " \
-        #                                   "'{0}%') {1};".format(self.dept, self.asset_sql1)
-        # asset_precipitated_capital_sql = "SELECT SUM(precipitated_capital) FROM `wbs_asset_cus_account` WHERE 1=1 " \
-        #                                   "AND cus_id IN (SELECT id FROM `wbs_customer` WHERE deptCode LIKE " \
-        #                                   "'{0}%') {1};".format(self.dept, self.asset_sql1)
-        # stock_funds_to_be_collected_sql = "SELECT SUM(funds_to_be_collected) FROM `wbs_stock_customer` WHERE 1=1 " \
-        #                                  "AND dept_code LIKE '{0}%' AND deleted=0 {1};".format(self.dept, self.asset_sql1)
-        # stock_precipitated_capital_sql = "SELECT SUM(precipitated_capital) FROM `wbs_stock_customer` WHERE 1=1 " \
-        #                                  "AND dept_code LIKE '{0}%' AND deleted=0 {1};".format(self.dept, self.asset_sql1)
         stock_funds_to_be_collected_sql = "SELECT SUM(funds_to_be_collected) FROM `wbs_stock_customer` WHERE 1=1 " \
                                          "AND dept_code LIKE '{0}%' AND create_time IS NOT NULL {1};".format(self.dept, self.asset_sql1)
         stock_precipitated_capital_sql = "SELECT SUM(precipitated_capital) FROM `wbs_stock_customer` WHERE 1=1 " \
                                          "AND dept_code LIKE '{0}%' AND create_time IS NOT NULL {1};".format(self.dept, self.asset_sql1)
-        # print("asset待收：" + asset_funds_to_be_collected_sql)
-        # print("asset沉淀：" + asset_precipitated_capital_sql)
-        # print("stock待收：" + stock_funds_to_be_collected_sql)
-        # print("stock待收：" + stock_precipitated_capital_sql)
-        # asset_funds_to_be_collected = self.exchange_None(self.execute_select(self.cur,asset_funds_to_be_collected_sql)[0][0])
-        # asset_precipitated_capital = self.exchange_None(self.execute_select(self.cur,asset_precipitated_capital_sql)[0][0])
+
         stock_funds_to_be_collected = self.exchange_None(self.execute_select(self.cur, stock_funds_to_be_collected_sql)[0][0])
         stock_precipitated_capital = self.exchange_None(self.execute_select(self.cur, stock_precipitated_capital_sql)[0][0])
-        # funds_to_be_collected = asset_funds_to_be_collected + stock_funds_to_be_collected
-        # precipitated_capital = asset_precipitated_capital + stock_precipitated_capital
-        # return [str(funds_to_be_collected/10000), str(precipitated_capital/10000)]
         return [str(stock_funds_to_be_collected/10000), str(stock_precipitated_capital/10000)]
 
     def openaccount_amount(self):
