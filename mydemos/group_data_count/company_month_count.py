@@ -43,7 +43,7 @@ class MonthCount(Optsql):
     def dept_name_date(self):
         ''' 获取部门名称和日期 '''
         dept_name_sql = "SELECT NAME FROM `wbs_department` WHERE CODE = '{0}';".format(self.dept)
-        dept_name = self.execute_select(self.cur,dept_name_sql)[0][0]
+        dept_name = self.execute_select(self.cur, dept_name_sql)[0][0]
         the_month = str(self.current_month)
         return [dept_name, the_month]
 

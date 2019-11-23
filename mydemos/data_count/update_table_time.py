@@ -14,8 +14,6 @@ class UpdateTableTime(Optsql):
         self.cur = self.conn_mysql()
         if date == '0':
             date_today = datetime.date.today()
-            # self.yesterday = str(date_today - datetime.timedelta(days=1))
-            # self.two_days_ago = str(date_today - datetime.timedelta(days=2))
         else:
             year, month, day = date.split('-')
             date_today = datetime.date(int(year), int(month), int(day)) + datetime.timedelta(days=1)
