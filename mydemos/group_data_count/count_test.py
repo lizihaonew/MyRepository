@@ -11,18 +11,18 @@ from company_month_count import month_count_main
 
 # #########################
 # 配置count_type字段值
-# company_name = 企业租户名称 nami、datang、qianle、shanshang
-# bumen = 销售快报 - 按部门统计  SHNMCW0002  1
+# company_name = 企业租户名称 nami、datang
+# bumen = 销售快报 - 按部门统计  SHNMCW0006  1
 # yuangong = 销售快报 - 按员工统计   13666666661
 # ribao = 销售日报  SHNMCW0002  2019-11-01
 # yuebao = 销售月报 SHNMCW0002  2019-11
 
 company_name = 'nami'
-count_type = 'yuebao'
+count_type = 'bumen'
 # #########################
 
 
-if company_name not in ("shengmei", "nami", "datang", "qianle"):
+if company_name not in ("shengmei", "nami", "datang"):
     print("company_name written wrong!!!")
 
 if count_type == 'bumen':

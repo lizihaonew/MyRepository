@@ -171,30 +171,30 @@ class DeptCount(Optsql):
             self.asset_sql1 = ''
         else:
             self.asset_sql1 = 'and asset = %s' % str(self.asset)
-        asset_openaccount_amount_today_sql = "SELECT COUNT(1) FROM `wbs_asset_cus_account` WHERE 1=1 AND cus_id " \
-                                             "IN (SELECT id FROM `wbs_customer` WHERE deptCode LIKE '{1}%') " \
-                                             "AND platform_account_opening_time LIKE '{0}%' " \
-                                             "{2};".format(self.today, self.dept, self.asset_sql1)
-        asset_openaccount_amount_yesterday_sql = "SELECT COUNT(1) FROM `wbs_asset_cus_account` WHERE 1=1 AND cus_id " \
-                                             "IN (SELECT id FROM `wbs_customer` WHERE deptCode LIKE '{1}%') " \
-                                             "AND platform_account_opening_time LIKE '{0}%' " \
-                                             "{2};".format(self.yesterday, self.dept, self.asset_sql1)
+        # asset_openaccount_amount_today_sql = "SELECT COUNT(1) FROM `wbs_asset_cus_account` WHERE 1=1 AND cus_id " \
+        #                                      "IN (SELECT id FROM `wbs_customer` WHERE deptCode LIKE '{1}%') " \
+        #                                      "AND platform_account_opening_time LIKE '{0}%' " \
+        #                                      "{2};".format(self.today, self.dept, self.asset_sql1)
+        # asset_openaccount_amount_yesterday_sql = "SELECT COUNT(1) FROM `wbs_asset_cus_account` WHERE 1=1 AND cus_id " \
+        #                                      "IN (SELECT id FROM `wbs_customer` WHERE deptCode LIKE '{1}%') " \
+        #                                      "AND platform_account_opening_time LIKE '{0}%' " \
+        #                                      "{2};".format(self.yesterday, self.dept, self.asset_sql1)
         stock_openaccount_amount_today_sql = "SELECT COUNT(1) FROM `wbs_stock_customer` WHERE 1=1 AND dept_code " \
                                              "LIKE '{1}%' AND platform_account_opening_time LIKE '{0}%' " \
-                                             "AND deleted=0 {2};".format(self.today, self.dept, self.asset_sql1)
+                                             "{2};".format(self.today, self.dept, self.asset_sql1)
         stock_openaccount_amount_yesterday_sql = "SELECT COUNT(1) FROM `wbs_stock_customer` WHERE 1=1 AND dept_code " \
                                              "LIKE '{1}%' AND platform_account_opening_time LIKE '{0}%' " \
-                                             "AND deleted=0 {2};".format(self.yesterday, self.dept, self.asset_sql1)
+                                             "{2};".format(self.yesterday, self.dept, self.asset_sql1)
 
-        asset_openaccount_amount_today = self.exchange_None(self.execute_select(self.cur,asset_openaccount_amount_today_sql)[0][0])
-        asset_openaccount_amount_yesterday = self.exchange_None(self.execute_select(self.cur,asset_openaccount_amount_yesterday_sql)[0][0])
+        # asset_openaccount_amount_today = self.exchange_None(self.execute_select(self.cur,asset_openaccount_amount_today_sql)[0][0])
+        # asset_openaccount_amount_yesterday = self.exchange_None(self.execute_select(self.cur,asset_openaccount_amount_yesterday_sql)[0][0])
         stock_openaccount_amount_today = self.exchange_None(self.execute_select(self.cur,stock_openaccount_amount_today_sql)[0][0])
         stock_openaccount_amount_yesterday = self.exchange_None(self.execute_select(self.cur,stock_openaccount_amount_yesterday_sql)[0][0])
 
-        openaccount_amount_today = asset_openaccount_amount_today + stock_openaccount_amount_today
-        openaccount_amount_yesterday = asset_openaccount_amount_yesterday + stock_openaccount_amount_yesterday
+        # openaccount_amount_today = asset_openaccount_amount_today + stock_openaccount_amount_today
+        # openaccount_amount_yesterday = asset_openaccount_amount_yesterday + stock_openaccount_amount_yesterday
 
-        return [str(openaccount_amount_today), str(openaccount_amount_yesterday)]
+        return [str(stock_openaccount_amount_today), str(stock_openaccount_amount_yesterday)]
 
     def first_invest_match_count(self):
         ''' 本月累计首投达标客户数、本日累计首投达标客户数 '''
@@ -321,35 +321,6 @@ def dept_count_main(dept, asset):
     result_deadline_invest = dc.deadline_num_invest_amount()
 
     dc.object_close()
-    # print('销售快报 - 按照部门统计，统计结果如下：')
-    # print('本日投资总额：' + today_amount)
-    # print('昨日投资总额：' + yesterday_amount)
-    # print('昨日投资业绩：' + yesterday_performance_amount)
-    # print('本日投资笔数：' + today_count)
-    # print('昨日投资笔数：' + yesterday_count)
-    # print('本月累计已还款：' + current_month_actual_exit_amount)
-    # print('本月累计待还款：' + current_month_expected_exit_amount)
-    # print('本月累计提现：' + cashout_current_month)
-    # print('本日累计提现：' + cashout_today)
-    # print('昨日累计提现：' + cashout_yesterday)
-    # print('本日提现占比：' + cashout_proportion_today)
-    # print('昨日提现占比：' + cashout_proportion_yesterday)
-    # print('本月累计充值：' + recharge_current_month)
-    # print('本日累计充值：' + recharge_today)
-    # print('昨日累计充值：' + recharge_yesterday)
-    # print('本日充值投资占比：' + recharge_proportion_today)
-    # print('本日还款投资：' + repay_investor_today)
-    # print('本日还款投资占比：' + repay_investor_proportion_today)
-    # print('本日净资金流：' + net_amount_today)
-    # print('昨日净资金流：' + net_amount_yesterday)
-    # print('客户待收总额：' + funds_to_be_collected)
-    # print('客户沉淀总额：' + precipitated_capital)
-    # print('本日累计开户数：' + openaccount_amount_today)
-    # print('昨日累计开户数：' + openaccount_amount_yesterday)
-    # print('本月累计首投达标客户数：' + month_fimc)
-    # print('本日累计首投达标客户数：' + today_fimc)
-    # print('本日各产品类型投资总额：' + result_product_type_invest)
-    # print('本日各期限产品投资总额：' + result_deadline_invest)
 
     comment = '销售快报 - 按照部门统计，统计结果如下：' + '(部门：%s, 资产端：%s)'%(dept_name, asset_name) + '\n'\
         '本日投资总额：' + today_amount + '\n'\

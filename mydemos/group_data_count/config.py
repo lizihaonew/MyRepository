@@ -5,17 +5,9 @@
 # @File     : config.py
 
 
-# ######## 开发环境圣玫租户库配置信息 #############
-shengmei = {
-    'host': 'rm-2ze1w9epp05wvc4j4po.mysql.rds.aliyuncs.com',
-    'username': 'wbs_shengmei',
-    'password': 'wbs_shengmei@123',
-    'db': 'wbs_shengmei'
-}
-
 # ######## 测试环境圣玫租户库配置信息 #############
-shengmei_test = {
-    'host': 'rm-2zej79lci1sjl9qxp.mysql.rds.aliyuncs.com',
+shengmei = {
+    'host': '47.95.129.33',
     'username': 'ningsheng_app_2',
     'password': 'Zm!fuC7g#kx%m*60',
     'db': 'wbs_shengmei'
@@ -30,24 +22,15 @@ nami = {
 
 # ######## 测试环境大唐租户库配置信息 #############
 datang = {
-    'host': 'rm-2ze3r058ks9ibbvnfqo.mysql.rds.aliyuncs.com',
+    'host': 'rm-2zeqv910hn9004t41.mysql.rds.aliyuncs.com',
     'username': 'wbs',
-    'password': 'NTBnami201904!',
+    'password': 'NTB-datang201908',
     'db': 'wbs-test'
 }
 
-# ######## 测试环境千乐租户库配置信息 #############
-qianle = {
-    'host': 'rm-2ze6e96qv9g9u5mchbo.mysql.rds.aliyuncs.com',
-    'username': 'wbs',
-    'password': 'NTB-qianle201907',
-    'db': 'wbs'
-}
-
 # ############ 各租户对应企业id #####################
-
 ent_id = {
-        "nami": "888",
+        "nami": "8001",
         "datang": "8002",
         "qianle": "8003"
     }

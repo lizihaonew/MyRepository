@@ -46,10 +46,10 @@ class Optsql:
         cur.execute(sql)
         return cur.fetchall()
 
-    # def update_table(self, cur, conn, sql):
-    #     res = cur.execute(sql)
-    #     conn.commit()
-    #     return res
+    def update_table(self, cur, conn, sql):
+        res = cur.execute(sql)
+        conn.commit()
+        return res
 
 
 if __name__ == '__main__':
