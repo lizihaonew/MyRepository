@@ -62,7 +62,7 @@ class DateCount(Optsql):
 
     def today_performance_amount(self):
         '''当日投资业绩'''
-        today_amount_sql = "SELECT SUM(performance_amount) FROM `ns_sop_order_snapshot` WHERE " \
+        today_amount_sql = "SELECT SUM(performance_amount) FROM `ns_sop_order_snapshot_summary` WHERE " \
                               "trans_time LIKE '{0}%' AND department_no LIKE '{1}%';".format(self.date, self.dept)
         today_performance_amount = self.exchange_None(self.execute_select(self.cur, today_amount_sql)[0][0])
         return str(today_performance_amount/10000)
@@ -97,20 +97,15 @@ class DateCount(Optsql):
                                           " LIKE '{0}%' AND day LIKE '{1}%' AND entId={2};".format(self.dept, self.date, self.ent_id[self.name])
         stock_funds_to_be_collected = self.exchange_None(self.execute_select(self.sm_cur, stock_funds_to_be_collected_sql)[0][0])
         stock_precipitated_capital = self.exchange_None(self.execute_select(self.sm_cur, stock_precipitated_capital_sql)[0][0])
-        return [str(stock_funds_to_be_collected/10000), str(stock_precipitated_capital/10000)]
+        return [str(stock_funds_to_be_collected), str(stock_precipitated_capital)]
 
     def openaccount_amount(self):
         ''' 当日开户客户数 '''
-        asset_openaccount_amount_today_sql = "SELECT COUNT(1) FROM `wbs_asset_cus_account` a, `wbs_customer` c WHERE" \
-                                             " c.deptCode LIKE '{0}%' AND c.id=a.cus_id AND" \
-                                             " platform_account_opening_time LIKE '{1}%';".format(self.dept, self.date)
         stock_openaccount_amount_today_sql = "SELECT COUNT(1) FROM `wbs_stock_customer` WHERE 1=1 AND dept_code " \
-                                             "LIKE '{1}%' AND deleted=0 AND platform_account_opening_time" \
+                                             "LIKE '{1}%' AND platform_account_opening_time" \
                                              " LIKE '{0}%';".format(self.date, self.dept)
-        asset_openaccount_amount_today = self.exchange_None(self.execute_select(self.cur, asset_openaccount_amount_today_sql)[0][0])
         stock_openaccount_amount_today = self.exchange_None(self.execute_select(self.cur, stock_openaccount_amount_today_sql)[0][0])
-        openaccount_amount_today = asset_openaccount_amount_today + stock_openaccount_amount_today
-        return str(openaccount_amount_today)
+        return str(stock_openaccount_amount_today)
 
     def first_invest_match_count(self):
         ''' 当日首投达标客户数 '''
@@ -226,5 +221,5 @@ def date_count_main(dept, date, name):
 
 
 if __name__ == '__main__':
-    # date_count_main('SHNMCW0002', '0')
-    date_count_main('SHNMCW0002', '2019-11-20', 'nami')
+    # date_count_main('SHNMCW0002', '0', 'nami')
+    date_count_main('SHNMCW0013', '2019-12-03', 'nami')

@@ -62,7 +62,7 @@ class DeptCount(Optsql):
 
     def yesterday_performance_amount(self):
         '''昨日投资业绩'''
-        yesterday_amount_sql = "SELECT SUM(performance_amount) FROM `ns_sop_order_snapshot` WHERE " \
+        yesterday_amount_sql = "SELECT SUM(performance_amount) FROM `ns_sop_order_snapshot_summary` WHERE " \
                               "trans_time LIKE '{0}%' AND department_no LIKE '{1}%' {2}" \
                               ";".format(self.yesterday, self.dept, self.asset_sql)
         yesterday_amount = self.exchange_None(self.execute_select(self.cur,yesterday_amount_sql)[0][0])

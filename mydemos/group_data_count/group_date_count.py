@@ -16,6 +16,7 @@ class GroupDateCount(Optsql):
         self.name = name
         self.entId = self.ent_id[self.name]
         self.cur, self.conn = self.conn_mysql("shengmei")
+        self.ent_cur, self.ent_conn = self.conn_mysql(self.name)
         date_today = datetime.date.today()
         default_date = date_today - datetime.timedelta(days=1)
         self.current_month = time.strftime('%Y-%m')
@@ -32,12 +33,11 @@ class GroupDateCount(Optsql):
         else:
             self.dept_sql = " AND deptCode like '%s'" % dept
 
-    def get_amount(self, sql):
-        res = super(GroupDateCount, self).execute_select(self.cur, sql)[0][0]
-        if res:
-            return str(res)
+    def exchange_None(self, para):
+        if para:
+            return para
         else:
-            return '0'
+            return 0
 
     def object_close(self):
         super(GroupDateCount, self).object_close(self.cur, self.conn)
@@ -50,169 +50,105 @@ class GroupDateCount(Optsql):
             the_dept = self.execute_select(self.cur, "SELECT deptName FROM `data_statistics_day` WHERE deptCode='%s';" % self.dept)[0][0]
         return [the_date, the_dept]
 
-    def invest_amount_today(self):
-        ''' 当日投资总额 '''
-        invest_amount_today_sql = "SELECT SUM(todayInvestAmount) FROM `data_statistics_day` WHERE entId='{0}' AND " \
-                                  "DAY='{1}'{2};".format(self.entId, self.date, self.dept_sql)
-        invest_amount_today = self.get_amount(invest_amount_today_sql)
-        return invest_amount_today
+    def company_count(self):
+        company_count_sql = "SELECT SUM(todayInvestAmount), SUM(todayInvestCount), SUM(todayInvestPerformance), SUM(todayReceivedPayment)," \
+                            " SUM(todayCashout), SUM(todayRecharge), SUM(todayReceivedInvest), SUM(todayNetCapital), SUM(fundsToBeCollected)," \
+                            " SUM(precipitatedCapital), SUM(todayOpeningAccountCount), SUM(todayFirstInvestCount) FROM `data_statistics_day` " \
+                            "WHERE  DAY = '{0}' AND entId = {1} AND deptLevel=1;".format(self.date, self.ent_id[self.name])
+        company_count_res = self.execute_select(self.cur, company_count_sql)[0]
+        todayInvestAmount, todayInvestCount, todayInvestPerformance, todayReceivedPayment, todayCashout, todayRecharge, todayReceivedInvest, todayNetCapital, fundsToBeCollected, precipitatedCapital, todayOpeningAccountCount, todayFirstInvestCount = [str(value) for value in company_count_res]
+        # print([str(value) for value in company_count_res])
 
-    def invest_count_today(self):
-        ''' 当日投资笔数 '''
-        invest_count_today_sql = "SELECT SUM(todayInvestCount) FROM `data_statistics_day` WHERE entId='{0}' AND " \
-                                 "DAY='{1}'{2};".format(self.entId, self.date, self.dept_sql)
-        invest_count_today = self.get_amount(invest_count_today_sql)
-        return invest_count_today
+        if todayReceivedPayment == '0.0000':
+            todayCashoutProportion = '0'
+        else:
+            todayCashoutProportion = str('%.2f%%' % eval("({0}/{1})*100".format(todayCashout, todayReceivedPayment)))
 
-    def today_performance_amount(self):
-        ''' 当日投资业绩 '''
-        performance_amount_sql = "SELECT SUM(todayInvestPerformance) FROM `data_statistics_day` WHERE entId='{0}' AND " \
-                                 "DAY='{1}'{2};".format(self.entId, self.date, self.dept_sql)
-        today_performance_amount = self.get_amount(performance_amount_sql)
-        return today_performance_amount
+        if todayInvestAmount == '0.0000':
+            todayRechargeInvestProportion = '0'
+        else:
+            todayRechargeInvestProportion = str('%.2f%%' % eval("({0}/{1})*100".format(todayRecharge, todayInvestAmount)))
 
-    def repayment_amount_today(self):
-        ''' 当日还款总额 '''
-        repayment_amount_sql = "SELECT SUM(todayReceivedPayment) FROM `data_statistics_day` WHERE entId='{0}' AND " \
-                                 "DAY='{1}'{2};".format(self.entId, self.date, self.dept_sql)
-        repayment_amount_today = self.get_amount(repayment_amount_sql)
-        return repayment_amount_today
+        if todayInvestAmount == '0.0000':
+            todayReceivedInvestProportion = '0'
+        else:
+            todayReceivedInvestProportion = str('%.2f%%' % eval("({0}/{1})*100".format(todayReceivedInvest, todayInvestAmount)))
 
-    def cashout_amount_today(self):
-        ''' 当日提现总额 '''
-        cashout_amount_sql = "SELECT SUM(todayCashout) FROM `data_statistics_day` WHERE entId='{0}' AND " \
-                                 "DAY='{1}'{2};".format(self.entId, self.date, self.dept_sql)
-        cashout_amount_today = self.get_amount(cashout_amount_sql)
-        return cashout_amount_today
+        type_ids_sql = "SELECT DISTINCT product_type FROM `ns_order` WHERE trans_time LIKE '{0}%';".format(self.date)
+        type_ids_today = [id[0] for id in self.execute_select(self.ent_cur, type_ids_sql)]
+        todayProductTypeInvestAmount = []
+        for id in type_ids_today:
+            product_type_name_sql = "SELECT product_type_name FROM `ns_product_type` WHERE id=%d;" % id
+            invest_amount_today_sql = "SELECT SUM(trans_amount) FROM `ns_order` WHERE product_type={0} AND trans_time LIKE" \
+                                      " '{1}%';".format(id, self.date, self.dept)
+            # print([product_type_name_sql,invest_amount_today_sql])
+            product_type_name = self.execute_select(self.ent_cur, product_type_name_sql)[0][0]
+            product_type_invest_amount = self.exchange_None(self.execute_select(self.ent_cur, invest_amount_today_sql)[0][0])
+            if not product_type_invest_amount:
+                continue
+            todayProductTypeInvestAmount.append((product_type_name + ':', '%.4f' % (product_type_invest_amount / 10000)))
 
-    def cashout_proportion_today(self):
-        ''' 当日提现占比 '''
-        cashout_proportion_sql = "SELECT SUM(todayCashoutProportion) FROM `data_statistics_day` WHERE entId='{0}' AND " \
-                                 "DAY='{1}'{2};".format(self.entId, self.date, self.dept_sql)
-        cashout_proportion_today = self.get_amount(cashout_proportion_sql)
-        return cashout_proportion_today
+        deadline_units_sql = "SELECT DISTINCT deadline_unit FROM `ns_order` WHERE trans_time LIKE '{0}%';".format(self.date)
+        deadline_nums_sql = "SELECT DISTINCT deadline_num FROM `ns_order` WHERE trans_time LIKE '{0}%';".format(self.date)
+        deadline_units_today = [id[0] for id in self.execute_select(self.ent_cur, deadline_units_sql)]
+        deadline_nums_today = [id[0] for id in self.execute_select(self.ent_cur, deadline_nums_sql)]
+        # print(deadline_units_today,deadline_nums_today)
+        todayDeadlineInvestAmount = []
+        for unit in deadline_units_today:
+            if unit == 1:
+                unit_name = '天'
+            elif unit == 2:
+                unit_name = '月'
+            else:
+                unit_name = '年'
+            for num in deadline_nums_today:
+                invest_amount_today_sql = "SELECT SUM(trans_amount) FROM `ns_order` WHERE deadline_unit={0} AND trans_time LIKE" \
+                                          " '{1}%' AND deadline_num={3};".format(unit, self.date, self.dept, num)
+                deadline_name = '{0}{1}'.format(str(num), unit_name)
+                deadline_invest_amount = self.exchange_None(self.execute_select(self.ent_cur, invest_amount_today_sql)[0][0])
+                if not deadline_invest_amount:
+                    continue
+                todayDeadlineInvestAmount.append(deadline_name + ': %.4f' % (deadline_invest_amount / 10000))
 
-    def recharge_amount_today(self):
-        ''' 当日充值总额 '''
-        recharge_amount_sql = "SELECT SUM(todayRecharge) FROM `data_statistics_day` WHERE entId='{0}' AND " \
-                                 "DAY='{1}'{2};".format(self.entId, self.date, self.dept_sql)
-        recharge_amount_today = self.get_amount(recharge_amount_sql)
-        return recharge_amount_today
-
-    def recharge_proportion_today(self):
-        ''' 当日充值投资占比 '''
-        recharge_proportion_sql = "SELECT SUM(todayRechargeInvestProportion) FROM `data_statistics_day` WHERE entId='{0}' AND " \
-                                 "DAY='{1}'{2};".format(self.entId, self.date, self.dept_sql)
-        recharge_proportion_today = self.get_amount(recharge_proportion_sql)
-        return recharge_proportion_today
-
-    def received_invest_today(self):
-        ''' 当日还款投资 '''
-        received_invest_sql = "SELECT SUM(todayReceivedInvest) FROM `data_statistics_day` WHERE entId='{0}' AND " \
-                                 "DAY='{1}'{2};".format(self.entId, self.date, self.dept_sql)
-        received_invest_today = self.get_amount(received_invest_sql)
-        return received_invest_today
-
-    def received_invest_proportion_today(self):
-        ''' 当日还款投资占比 '''
-        received_invest_proportion_sql = "SELECT SUM(todayReceivedInvestProportion) FROM `data_statistics_day` WHERE entId='{0}' AND " \
-                                 "DAY='{1}'{2};".format(self.entId, self.date, self.dept_sql)
-        received_invest_proportion_today = self.get_amount(received_invest_proportion_sql)
-        return received_invest_proportion_today
-
-    def net_capital_today(self):
-        ''' 当日净资金流 '''
-        net_capital_sql = "SELECT SUM(todayNetCapital) FROM `data_statistics_day` WHERE entId='{0}' AND " \
-                                 "DAY='{1}'{2};".format(self.entId, self.date, self.dept_sql)
-        net_capital_today = self.get_amount(net_capital_sql)
-        return net_capital_today
-
-    def funds_to_be_collected(self):
-        ''' 当日待收总额 '''
-        funds_to_be_collected_sql = "SELECT SUM(fundsToBeCollected) FROM `data_statistics_day` WHERE entId='{0}' AND " \
-                                 "DAY='{1}'{2};".format(self.entId, self.date, self.dept_sql)
-        funds_to_be_collected = self.get_amount(funds_to_be_collected_sql)
-        return funds_to_be_collected
-
-    def precipitated_capital(self):
-        ''' 当日沉淀总额 '''
-        precipitated_capital_sql = "SELECT SUM(precipitatedCapital) FROM `data_statistics_day` WHERE entId='{0}' AND " \
-                                 "DAY='{1}'{2};".format(self.entId, self.date, self.dept_sql)
-        precipitated_capital = self.get_amount(precipitated_capital_sql)
-        return precipitated_capital
-
-    def opening_account_count_today(self):
-        ''' 当日开户客户数 '''
-        opening_account_count_sql = "SELECT SUM(todayOpeningAccountCount) FROM `data_statistics_day` WHERE entId='{0}' AND " \
-                                 "DAY='{1}'{2};".format(self.entId, self.date, self.dept_sql)
-        opening_account_count_today = self.get_amount(opening_account_count_sql)
-        return opening_account_count_today
-
-    def first_invest_count_today(self):
-        ''' 当日首投达标客户数 '''
-        first_invest_count_sql = "SELECT SUM(todayFirstInvestCount) FROM `data_statistics_day` WHERE entId='{0}' AND " \
-                                 "DAY='{1}'{2};".format(self.entId, self.date, self.dept_sql)
-        first_invest_count_today = self.get_amount(first_invest_count_sql)
-        return first_invest_count_today
-
-    def product_type_invest_amount_today(self):
-        ''' 当日各产品类型投资总额 '''
-        product_type_invest_amount_sql = "SELECT SUM(todayProductTypeInvestAmount) FROM `data_statistics_day` WHERE entId='{0}' AND " \
-                                 "DAY='{1}'{2};".format(self.entId, self.date, self.dept_sql)
-        product_type_invest_amount_today = self.get_amount(product_type_invest_amount_sql)
-        return product_type_invest_amount_today
+        return [todayInvestAmount, todayInvestCount, todayInvestPerformance, todayReceivedPayment, todayCashout, todayCashoutProportion, todayRecharge, todayReceivedInvest, todayRechargeInvestProportion, todayReceivedInvestProportion, todayNetCapital, fundsToBeCollected, precipitatedCapital, todayOpeningAccountCount, todayFirstInvestCount, str(todayProductTypeInvestAmount), str(todayDeadlineInvestAmount)]
 
 
 def group_date_count_main(dept, date, name):
     gdcm = GroupDateCount(dept, date, name)
     company_name = gdcm.ent_name[name]
     the_date, the_dept = gdcm.get_dept_date()
-    invest_amount_today = gdcm.invest_amount_today()
-    invest_count_today = gdcm.invest_count_today()
-    today_performance_amount = gdcm.today_performance_amount()
-    repayment_amount_today = gdcm.repayment_amount_today()
-    cashout_amount_today = gdcm.cashout_amount_today()
-    cashout_proportion_today = gdcm.cashout_proportion_today()
-    recharge_amount_today = gdcm.recharge_amount_today()
-    recharge_proportion_today = gdcm.recharge_proportion_today()
-    received_invest_today = gdcm.received_invest_today()
-    received_invest_proportion_today = gdcm.received_invest_proportion_today()
-    net_capital_today = gdcm.net_capital_today()
-    funds_to_be_collected = gdcm.funds_to_be_collected()
-    precipitated_capital = gdcm.precipitated_capital()
-    opening_account_count_today = gdcm.opening_account_count_today()
-    first_invest_count_today = gdcm.first_invest_count_today()
-    product_type_invest_amount_today = gdcm.product_type_invest_amount_today()
-
+    company_count_res = gdcm.company_count()
+    todayInvestAmount, todayInvestCount, todayInvestPerformance, todayReceivedPayment, todayCashout, todayCashoutProportion, todayRecharge, todayReceivedInvest, todayRechargeInvestProportion, todayReceivedInvestProportion, todayNetCapital, fundsToBeCollected, precipitatedCapital, todayOpeningAccountCount, todayFirstInvestCount, todayProductTypeInvestAmount, todayDeadlineInvestAmount = company_count_res
 
     gdcm.object_close()
 
     comment = '集团数据统计，销售日报，统计结果如下：' + '( 公司名称：%s, 部门：%s, 日期：%s )'%(company_name, the_dept, the_date) + '\n'\
-        '当日投资总额：' + invest_amount_today + '\n'\
-        '当日投资笔数：' + invest_count_today + '\n'\
-        '当日投资业绩：' + today_performance_amount + '\n'\
-        '当日还款总额：' + repayment_amount_today + '\n'\
-        '当日提现总额：' + cashout_amount_today + '\n'\
-        '当日提现占比：' + cashout_proportion_today + '\n'\
-        '当日充值总额：' + recharge_amount_today + '\n'\
-        '当日充值投资占比：' + recharge_proportion_today + '\n'\
-        '当日还款投资：' + received_invest_today + '\n'\
-        '当日还款投资占比：' + received_invest_proportion_today + '\n'\
-        '当日净资金流：' + net_capital_today + '\n'\
-        '当日待收总额：' + funds_to_be_collected + '\n'\
-        '当日沉淀总额：' + precipitated_capital + '\n'\
-        '当日开户客户数：' + opening_account_count_today + '\n'\
-        '当日首投达标客户数：' + first_invest_count_today + '\n'\
-        '当日各产品类型投资总额：' + product_type_invest_amount_today + '\n'\
+        '当日投资总额：' + todayInvestAmount + '\n'\
+        '当日投资笔数：' + todayInvestCount + '\n'\
+        '当日投资业绩：' + todayInvestPerformance + '\n'\
+        '当日还款总额：' + todayReceivedPayment + '\n'\
+        '当日提现总额：' + todayCashout + '\n'\
+        '当日提现占比：' + todayCashoutProportion + '\n'\
+        '当日充值总额：' + todayRecharge + '\n'\
+        '当日充值投资占比：' + todayRechargeInvestProportion + '\n'\
+        '当日还款投资：' + todayReceivedInvest + '\n'\
+        '当日还款投资占比：' + todayReceivedInvestProportion + '\n'\
+        '当日净资金流：' + todayNetCapital + '\n'\
+        '当日待收总额：' + fundsToBeCollected + '\n'\
+        '当日沉淀总额：' + precipitatedCapital + '\n'\
+        '当日开户客户数：' + todayOpeningAccountCount + '\n'\
+        '当日首投达标客户数：' + todayFirstInvestCount + '\n'\
+        '当日各产品类型投资总额：' + todayProductTypeInvestAmount + '\n' \
+        '当月各期限产品投资总额：' + todayDeadlineInvestAmount
 
     print(comment)
 
 
 if __name__ == '__main__':
-    # group_date_count_main('0', '0', 'nami')
-    # group_date_count_main('SHNMCW0002', '2019-11-20', 'nami')
-    # group_date_count_main('SHNMCW0004', '2019-11-20', 'nami')
-    group_date_count_main('0', '2019-11-20', 'nami')
+    # group_date_count_main(部门, 日期, 公司)
+    group_date_count_main('0', '2019-12-04', 'nami')
+    # group_date_count_main('0', '2019-12-03', 'datang')
+
 
 
 

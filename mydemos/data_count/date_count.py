@@ -55,7 +55,7 @@ class DateCount(Optsql):
 
     def today_performance_amount(self):
         '''当日投资业绩'''
-        today_amount_sql = "SELECT SUM(performance_amount) FROM `ns_sop_order_snapshot` WHERE " \
+        today_amount_sql = "SELECT SUM(performance_amount) FROM `ns_sop_order_snapshot_summary` WHERE " \
                               "trans_time LIKE '{0}%' AND department_no LIKE '{1}%';".format(self.date, self.dept)
         today_performance_amount = self.exchange_None(self.execute_select(self.cur,today_amount_sql)[0][0])
         return str(today_performance_amount/10000)
