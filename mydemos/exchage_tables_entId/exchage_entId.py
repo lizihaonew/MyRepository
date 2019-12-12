@@ -14,13 +14,19 @@
 # import MySQLdb
 import pymysql
 
-###############################
-host = 'rm-2ze3r058ks9ibbvnfqo.mysql.rds.aliyuncs.com'
+# ######## 测试环境纳觅租户库配置信息 #############
+# host = 'rm-2ze3r058ks9ibbvnfqo.mysql.rds.aliyuncs.com'
+# username = 'wbs'
+# password = 'NTBnami201904!'
+# db = 'wbs-sec'
+# new_entId = '8001'
+# ######## 测试环境大唐租户库配置信息 #############
+host = 'rm-2zeqv910hn9004t41.mysql.rds.aliyuncs.com'
 username = 'wbs'
-password = 'NTBnami201904!'
-db = 'wbs-sec'
-new_entId = '8001'
-################################
+password = 'NTB-datang201908'
+db = 'wbs-test'
+new_entId = '8002'
+# ##################################################
 
 
 def conn_mysql():

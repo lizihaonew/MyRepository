@@ -63,9 +63,9 @@ class MonthCount(Optsql):
 
     def performance_amount(self):
         '''当月投资业绩、上月投资业绩'''
-        current_month_amount_sql = "SELECT SUM(performance_amount) FROM `ns_sop_order_snapshot` WHERE " \
+        current_month_amount_sql = "SELECT SUM(performance_amount) FROM `ns_sop_order_snapshot_summary` WHERE " \
                               "Convert(trans_time,CHAR(20)) LIKE '{0}%' AND department_no LIKE '{1}%';".format(self.current_month, self.dept)
-        last_month_amount_sql = "SELECT SUM(performance_amount) FROM `ns_sop_order_snapshot` WHERE " \
+        last_month_amount_sql = "SELECT SUM(performance_amount) FROM `ns_sop_order_snapshot_summary` WHERE " \
                                    "Convert(trans_time,CHAR(20)) LIKE '{0}%' AND department_no LIKE '{1}%';".format(self.last_month, self.dept)
         current_month_performance_amount = self.exchange_None(self.execute_select(self.cur, current_month_amount_sql)[0][0])
         last_month_performance_amount = self.exchange_None(self.execute_select(self.cur, last_month_amount_sql)[0][0])

@@ -14,8 +14,6 @@ class UpdateTableTime(Optsql):
         self.cur = self.conn_mysql()
         if date == '0':
             date_today = datetime.date.today()
-            # self.yesterday = str(date_today - datetime.timedelta(days=1))
-            # self.two_days_ago = str(date_today - datetime.timedelta(days=2))
         else:
             year, month, day = date.split('-')
             date_today = datetime.date(int(year), int(month), int(day)) + datetime.timedelta(days=1)
@@ -30,9 +28,9 @@ class UpdateTableTime(Optsql):
         # print(ns_order_today_sql)
         ns_order_yesterday_sql = "UPDATE ns_order SET trans_time='{0} 00:00:00' WHERE trans_time LIKE " \
                                  "'{1}%';".format(self.yesterday, self.two_days_ago)
-        ns_sop_order_snapshot_today_sql = "UPDATE ns_sop_order_snapshot SET trans_time='{0} 00:00:00' WHERE trans_time" \
+        ns_sop_order_snapshot_today_sql = "UPDATE ns_sop_order_snapshot_summary SET trans_time='{0} 00:00:00' WHERE trans_time" \
                                           " LIKE '{1}%';".format(self.today, self.yesterday)
-        ns_sop_order_snapshot_yesterday_sql = "UPDATE ns_sop_order_snapshot SET trans_time='{0} 00:00:00' WHERE " \
+        ns_sop_order_snapshot_yesterday_sql = "UPDATE ns_sop_order_snapshot_summary SET trans_time='{0} 00:00:00' WHERE " \
                                               "trans_time LIKE '{1}%';".format(self.yesterday, self.two_days_ago)
         actual_exit_time_today_sql = "UPDATE wbs_received_payment SET actual_exit_time='{0} 00:00:00' WHERE " \
                                      "actual_exit_time LIKE '{1}%';".format(self.today, self.yesterday)
