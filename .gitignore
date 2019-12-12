@@ -7,3 +7,7 @@
 *.gif
 *.jpg
 *report.html
+*.bak
+*.iml
+.idea
+/.idea

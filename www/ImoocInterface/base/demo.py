@@ -8,7 +8,7 @@ import requests
 import json
 
 
-class RunMain:
+class RunMain():
     # def __init__(self, url, mathod, data=None):
     #     self.res = self.run_main(url, mathod, data)
 

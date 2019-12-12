@@ -52,16 +52,16 @@ try:
     WebDriverWait(driver, 10, 0.5).until(EC.invisibility_of_element_located((By.CSS_SELECTOR, '.layui-layer-content')))
     title = driver.find_element_by_css_selector(
         'div:nth-child(3) > div > table > tbody > tr:nth-child(1) > td:nth-child(1) > a').text
-    print title
+    print(title)
     second_type = driver.find_element_by_css_selector(
         'div:nth-child(3) > div > table > tbody > tr:nth-child(1) > td:nth-child(2) > span').text
-    print second_type
+    print(second_type)
 
     driver.find_element_by_css_selector(
         'div:nth-child(3) > div > table > tbody > tr:nth-child(1) > td:nth-child(1) > a').click()
     text_detail = driver.find_element_by_css_selector(
         '#form > div > fieldset > div > div > div:nth-child(5) > div > span').text
-    print text_detail
+    print(text_detail)
     driver.find_element_by_css_selector('#page-wrapper > div > div > div > div > div.ibox-title > div > a').click()
 
     driver.find_element_by_css_selector(
@@ -72,23 +72,23 @@ try:
     WebDriverWait(driver, 10, 0.5).until(EC.invisibility_of_element_located((By.CSS_SELECTOR, '.layui-layer-content')))
     title = driver.find_element_by_css_selector(
         'div:nth-child(3) > div > table > tbody > tr:nth-child(1) > td:nth-child(1) > a').text
-    print title
+    print(title)
 
     driver.find_element_by_css_selector('#cp_name').send_keys('AutoTestUpdateTitle')
     driver.find_element_by_css_selector('#_query').click()
     title = driver.find_element_by_css_selector(
         'div:nth-child(3) > div > table > tbody > tr:nth-child(1) > td:nth-child(1) > a').text
-    print title
+    print(title)
 
     driver.find_element_by_css_selector(
         'div:nth-child(3) > div > table > tbody > tr:nth-child(1) > td:nth-child(7) > a:nth-child(2)').click()
     driver.find_element_by_css_selector(
         'body > div.alertBox3 > div > div.content-wrapper > label > b.confirm-btn').click()
     success_tip = driver.find_element_by_css_selector('.layui-layer-content').text
-    print success_tip
+    print(success_tip)
 
 except Exception as e:
-    print e
+    print(e)
 
 time.sleep(3)
 driver.quit()
