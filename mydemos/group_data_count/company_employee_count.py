@@ -2,17 +2,17 @@
 # -*- coding: utf-8 -*-
 # @Author   : Li ZiHao
 # @Time     : 2019/11/2 0:30
-# @File     : employee_count.py
+# @File     : company_employee_count.py
 
 import datetime
 import time
-from opt_mysql import Optsql
+from opt_group_mysql import Optsql
 
 
 class EmployeeCount(Optsql):
-    def __init__(self, mobile):
+    def __init__(self, mobile, name):
         self.mobile = mobile
-        self.cur = self.conn_mysql()
+        self.cur, self.conn = self.conn_mysql(name)
         date_today = datetime.date.today()
         self.today = str(date_today)
         self.yesterday = str(date_today - datetime.timedelta(days=1))
@@ -20,11 +20,14 @@ class EmployeeCount(Optsql):
         self.fa_id = str(self.execute_select(self.cur, "SELECT id FROM `wbs_employee` WHERE mobile='{0}' AND "
                                                        "dismissionDate IS NULL;".format(self.mobile))[0][0])
 
-    def exchange_None(self,para):
+    def exchange_None(self, para):
         if para:
             return para
         else:
             return 0
+
+    def object_close(self):
+        super(EmployeeCount, self).object_close(self.cur, self.conn)
 
     def employee_information(self):
         ''' 员工姓名、手机号、部门 '''
@@ -59,19 +62,11 @@ class EmployeeCount(Optsql):
 
     def funds_amount(self):
         ''' 客户待收总额、客户沉淀总额 '''
-        # asset_funds_to_be_collected_sql = "SELECT SUM(a.funds_to_be_collected) FROM wbs_asset_cus_account a, " \
-        #                                   "wbs_customer c WHERE c.faId={0} AND a.cus_id=c.id;".format(self.fa_id)
-        # asset_precipitated_capital_sql = "SELECT SUM(a.precipitated_capital) FROM wbs_asset_cus_account a, " \
-        #                                   "wbs_customer c WHERE c.faId={0} AND a.cus_id=c.id;".format(self.fa_id)
         stock_funds_to_be_collected_sql = "SELECT SUM(funds_to_be_collected) FROM wbs_stock_customer WHERE fa_id={0};".format(self.fa_id)
         stock_precipitated_capital_sql = "SELECT SUM(precipitated_capital) FROM wbs_stock_customer WHERE fa_id={0};".format(self.fa_id)
-        # asset_funds_to_be_collected = self.exchange_None(self.execute_select(self.cur,asset_funds_to_be_collected_sql)[0][0])
-        # asset_precipitated_capital = self.exchange_None(self.execute_select(self.cur,asset_precipitated_capital_sql)[0][0])
         stock_funds_to_be_collected = self.exchange_None(self.execute_select(self.cur,stock_funds_to_be_collected_sql)[0][0])
         stock_precipitated_capital = self.exchange_None(self.execute_select(self.cur,stock_precipitated_capital_sql)[0][0])
-        # funds_to_be_collected = asset_funds_to_be_collected + stock_funds_to_be_collected
-        # precipitated_capital = asset_precipitated_capital + stock_precipitated_capital
-        # return [str(funds_to_be_collected/10000), str(precipitated_capital/10000)]
+
         return [str(stock_funds_to_be_collected/10000), str(stock_precipitated_capital/10000)]
 
     def openaccount_amount(self):
@@ -123,8 +118,8 @@ class EmployeeCount(Optsql):
         return [str(month_fimc),str(today_fimc)]
 
 
-def employee_count_main(mobile):
-    ec = EmployeeCount(mobile)
+def employee_count_main(mobile, name):
+    ec = EmployeeCount(mobile, name)
     employee_name, employee_mobile, employee_dept = ec.employee_information()
     today_amount, yesterday_amount = ec.invest_amount()
     yesterday_performance_amount = ec.yesterday_performance_amount()
@@ -133,6 +128,7 @@ def employee_count_main(mobile):
     openaccount_amount_today, openaccount_amount_yesterday = ec.openaccount_amount()
     month_fimc, today_fimc = ec.first_invest_match_count()
 
+    ec.object_close()
 
     comment = '销售快报 - 按照员工统计，统计结果如下：' + '( 员工：%s, 手机号：%s，部门：%s )' % (employee_name, employee_mobile, employee_dept) + '\n' \
         '本日投资总额：' + today_amount + '\n' \
@@ -151,4 +147,4 @@ def employee_count_main(mobile):
 
 
 if __name__ == '__main__':
-    employee_count_main('16666666666')
+    employee_count_main('16666666666', 'datang')

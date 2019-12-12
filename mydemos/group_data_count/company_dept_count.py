@@ -2,32 +2,35 @@
 # -*- coding: utf-8 -*-
 # @Author   : Li ZiHao
 # @Time     : 2019/10/30 21:43
-# @File     : dept_count.py
+# @File     : company_dept_count.py
 
 import datetime
 import time
-from opt_mysql import Optsql
+from opt_group_mysql import Optsql
 
 
 class DeptCount(Optsql):
-    def __init__(self, dept, asset):
+    def __init__(self, dept, asset, name):
         self.dept = dept
         self.asset = asset
         if self.asset == 0:
             self.asset_sql = ''
         else:
             self.asset_sql = 'and asset_id = %s' % str(self.asset)
-        self.cur = self.conn_mysql()
+        self.cur, self.conn = self.conn_mysql(name)
         date_today = datetime.date.today()
         self.today = str(date_today)
         self.yesterday = str(date_today - datetime.timedelta(days=1))
         self.current_month = time.strftime('%Y-%m')
 
-    def exchange_None(self,para):
+    def exchange_None(self, para):
         if para:
             return para
         else:
             return 0
+
+    def object_close(self):
+        super(DeptCount, self).object_close(self.cur, self.conn)
 
     def dept_asset_name(self):
         ''' 获取部门名称和资产端名称 '''
@@ -171,14 +174,6 @@ class DeptCount(Optsql):
             self.asset_sql1 = ''
         else:
             self.asset_sql1 = 'and asset = %s' % str(self.asset)
-        # asset_openaccount_amount_today_sql = "SELECT COUNT(1) FROM `wbs_asset_cus_account` WHERE 1=1 AND cus_id " \
-        #                                      "IN (SELECT id FROM `wbs_customer` WHERE deptCode LIKE '{1}%') " \
-        #                                      "AND platform_account_opening_time LIKE '{0}%' " \
-        #                                      "{2};".format(self.today, self.dept, self.asset_sql1)
-        # asset_openaccount_amount_yesterday_sql = "SELECT COUNT(1) FROM `wbs_asset_cus_account` WHERE 1=1 AND cus_id " \
-        #                                      "IN (SELECT id FROM `wbs_customer` WHERE deptCode LIKE '{1}%') " \
-        #                                      "AND platform_account_opening_time LIKE '{0}%' " \
-        #                                      "{2};".format(self.yesterday, self.dept, self.asset_sql1)
         stock_openaccount_amount_today_sql = "SELECT COUNT(1) FROM `wbs_stock_customer` WHERE 1=1 AND dept_code " \
                                              "LIKE '{1}%' AND platform_account_opening_time LIKE '{0}%' " \
                                              "{2};".format(self.today, self.dept, self.asset_sql1)
@@ -186,13 +181,8 @@ class DeptCount(Optsql):
                                              "LIKE '{1}%' AND platform_account_opening_time LIKE '{0}%' " \
                                              "{2};".format(self.yesterday, self.dept, self.asset_sql1)
 
-        # asset_openaccount_amount_today = self.exchange_None(self.execute_select(self.cur,asset_openaccount_amount_today_sql)[0][0])
-        # asset_openaccount_amount_yesterday = self.exchange_None(self.execute_select(self.cur,asset_openaccount_amount_yesterday_sql)[0][0])
         stock_openaccount_amount_today = self.exchange_None(self.execute_select(self.cur,stock_openaccount_amount_today_sql)[0][0])
         stock_openaccount_amount_yesterday = self.exchange_None(self.execute_select(self.cur,stock_openaccount_amount_yesterday_sql)[0][0])
-
-        # openaccount_amount_today = asset_openaccount_amount_today + stock_openaccount_amount_today
-        # openaccount_amount_yesterday = asset_openaccount_amount_yesterday + stock_openaccount_amount_yesterday
 
         return [str(stock_openaccount_amount_today), str(stock_openaccount_amount_yesterday)]
 
@@ -283,8 +273,8 @@ class DeptCount(Optsql):
         return str(result_deadline_invest)
 
 
-def dept_count_main(dept, asset):
-    dc = DeptCount(dept, asset)
+def dept_count_main(dept, asset, name):
+    dc = DeptCount(dept, asset, name)
     dept_name, asset_name = dc.dept_asset_name()
     today_amount, yesterday_amount = dc.invest_amount()
     yesterday_performance_amount = dc.yesterday_performance_amount()
@@ -294,22 +284,22 @@ def dept_count_main(dept, asset):
     exit_amount_today,exit_amount_yesterday = dc.exit_amount()
 
     if exit_amount_today != '0.0':
-        cashout_proportion_today = str('%.2f%%' % eval(cashout_today+'/'+exit_amount_today+'*100'))
+        cashout_proportion_today = str('%.4f%%' % eval(cashout_today+'/'+exit_amount_today+'*100'))
     else:
         cashout_proportion_today = '0'
 
     if exit_amount_yesterday != '0.0':
-        cashout_proportion_yesterday = str('%.2f%%' % eval(cashout_yesterday+'/'+exit_amount_yesterday+'*100'))
+        cashout_proportion_yesterday = str('%.4f%%' % eval(cashout_yesterday+'/'+exit_amount_yesterday+'*100'))
     else:
         cashout_proportion_yesterday = '0'
     recharge_current_month,recharge_today,recharge_yesterday = dc.recharge_amount()
     if today_amount != '0.0':
-        recharge_proportion_today = str('%.2f%%' % eval(recharge_today+'/'+today_amount+'*100'))
+        recharge_proportion_today = str('%.4f%%' % eval(recharge_today+'/'+today_amount+'*100'))
     else:
         recharge_proportion_today = '0'
     repay_investor_today = str(eval(today_amount+'-'+recharge_today))
     if today_amount != '0.0':
-        repay_investor_proportion_today = str('%.2f%%' % eval(repay_investor_today+'/'+today_amount + '*100'))
+        repay_investor_proportion_today = str('%.4f%%' % eval(repay_investor_today+'/'+today_amount + '*100'))
     else:
         repay_investor_proportion_today = '0'
     net_amount_today = str(eval(recharge_today+'-'+cashout_today))
@@ -326,8 +316,8 @@ def dept_count_main(dept, asset):
         '本日投资总额：' + today_amount + '\n'\
         '昨日投资总额：' + yesterday_amount + '\n'\
         '昨日投资业绩：' + yesterday_performance_amount + '\n'\
-        '本日投资笔数：' + today_count + '\n'\
-        '昨日投资笔数：' + yesterday_count + '\n'\
+        '昨日投资笔数：' + yesterday_count + '\n' \
+        '本日投资笔数：' + today_count + '\n' \
         '本月累计已还款：' + current_month_actual_exit_amount + '\n'\
         '本月累计待还款：' + current_month_expected_exit_amount + '\n'\
         '本月累计提现：' + cashout_current_month + '\n'\
@@ -347,16 +337,14 @@ def dept_count_main(dept, asset):
         '客户沉淀总额：' + precipitated_capital + '\n'\
         '本日累计开户数：' + openaccount_amount_today + '\n'\
         '昨日累计开户数：' + openaccount_amount_yesterday + '\n'\
-        '本月累计首投达标客户数：' + month_fimc + '\n'\
-        '本日累计首投达标客户数：' + today_fimc + '\n'\
+        '本日累计首投达标客户数：' + today_fimc + '\n' \
+        '本月累计首投达标客户数：' + month_fimc + '\n' \
         '本日各产品类型投资总额：' + result_product_type_invest + '\n'\
         '本日各期限产品投资总额：' + result_deadline_invest
     print(comment)
 
 
 if __name__ == '__main__':
-    dept_count_main('SHNMZX000100010001000100010001', 0)
-    # dept_count_main('SHNMCW0002', 3)
-    # dcc = DeptCount('SHNMCW0002', 3)
-    # print(dcc.type_invest_amount())
+    dept_count_main('SHNMCW000600010001000100010001', 3, 'nami')
+
 

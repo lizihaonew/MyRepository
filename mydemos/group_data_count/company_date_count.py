@@ -2,21 +2,22 @@
 # -*- coding: utf-8 -*-
 # @Author   : Li ZiHao
 # @Time     : 2019/11/2 0:38
-# @File     : date_count.py
+# @File     : company_date_count.py
 
 import datetime
 import time
-from opt_mysql import Optsql
+import opt_group_mysql
+from opt_group_mysql import Optsql
 
 
 class DateCount(Optsql):
-    def __init__(self, dept, date):
+    def __init__(self, dept, date, name):
         self.dept = dept
-        self.cur = self.conn_mysql()
-        self.sm_cur = self.conn_sm_mysql()
+        self.name = name
+        self.cur, self.conn = self.conn_mysql(name)
+        self.sm_cur, self.sm_conn = self.conn_mysql("shengmei")
         date_today = datetime.date.today()
         default_date = date_today - datetime.timedelta(days=1)
-        # self.today = str(date_today)
         self.current_month = time.strftime('%Y-%m')
         if date == '0':
             self.date = default_date
@@ -26,16 +27,22 @@ class DateCount(Optsql):
             year, month, day = self.date.split('-')
             self.yesterday = str(datetime.date(int(year), int(month), int(day)) - datetime.timedelta(days=1))
 
-    def exchange_None(self,para):
+    def exchange_None(self, para):
         if para:
             return para
         else:
             return 0
 
+    def object_close(self):
+        super(DateCount, self).object_close(self.cur, self.conn)
+
+    def object_sm_close(self):
+        super(DateCount, self).object_close(self.sm_cur, self.sm_conn)
+
     def dept_name_date(self):
         ''' 获取部门名称和日期 '''
         dept_name_sql = "SELECT NAME FROM `wbs_department` WHERE CODE = '{0}';".format(self.dept)
-        dept_name = self.execute_select(self.cur,dept_name_sql)[0][0]
+        dept_name = self.execute_select(self.cur, dept_name_sql)[0][0]
         the_datetime = str(self.date)
         return [dept_name, the_datetime]
 
@@ -43,21 +50,21 @@ class DateCount(Optsql):
         '''当日投资总额 '''
         today_amount_sql = "SELECT SUM(trans_amount) FROM `ns_order` WHERE trans_time " \
                           "LIKE '{0}%' AND dept_code LIKE '{1}%';".format(self.date, self.dept)
-        today_amount = self.exchange_None(self.execute_select(self.cur,today_amount_sql)[0][0])
+        today_amount = self.exchange_None(self.execute_select(self.cur, today_amount_sql)[0][0])
         return str(today_amount/10000)
 
     def invest_count(self):
         '''当日投资笔数'''
         today_count_sql = "SELECT COUNT(1) FROM `ns_order` WHERE trans_time " \
                           "LIKE '{0}%' AND dept_code LIKE '{1}%';".format(self.date, self.dept)
-        today_count = self.exchange_None(self.execute_select(self.cur,today_count_sql)[0][0])
+        today_count = self.exchange_None(self.execute_select(self.cur, today_count_sql)[0][0])
         return str(today_count)
 
     def today_performance_amount(self):
         '''当日投资业绩'''
         today_amount_sql = "SELECT SUM(performance_amount) FROM `ns_sop_order_snapshot_summary` WHERE " \
                               "trans_time LIKE '{0}%' AND department_no LIKE '{1}%';".format(self.date, self.dept)
-        today_performance_amount = self.exchange_None(self.execute_select(self.cur,today_amount_sql)[0][0])
+        today_performance_amount = self.exchange_None(self.execute_select(self.cur, today_amount_sql)[0][0])
         return str(today_performance_amount/10000)
 
     def repayment_amount_today(self):
@@ -65,7 +72,7 @@ class DateCount(Optsql):
         repayed_amount_sql = "SELECT SUM(actual_exit_amount) FROM `wbs_received_payment` WHERE " \
                              "Convert(actual_exit_time,CHAR(20)) LIKE '{0}%' AND STATUS = 2 AND dept_code " \
                              "LIKE '{1}%';".format(self.date, self.dept)
-        repayed_amount_today = self.exchange_None(self.execute_select(self.cur,repayed_amount_sql)[0][0])
+        repayed_amount_today = self.exchange_None(self.execute_select(self.cur, repayed_amount_sql)[0][0])
         return str(repayed_amount_today/10000)
 
     def cashout_amount(self):
@@ -82,49 +89,23 @@ class DateCount(Optsql):
         recharge_today = self.exchange_None(self.execute_select(self.cur, recharge_today_sql)[0][0])
         return str(recharge_today/10000)
 
-    # def funds_amount(self):
-    #     ''' 当日待收总额、当日沉淀总额 '''
-    #     # asset_funds_to_be_collected_sql = "SELECT SUM(a.funds_to_be_collected) FROM `wbs_asset_cus_account` a, " \
-    #     #                                   "`wbs_customer` c WHERE c.`deptCode` LIKE '{0}%' AND a.`update_time`" \
-    #     #                                   " LIKE '{1}%' AND a.`cus_id`=c.`id`;".format(self.dept, self.date)
-    #     # asset_precipitated_capital_sql = "SELECT SUM(a.precipitated_capital) FROM `wbs_asset_cus_account` a, " \
-    #     #                                   "`wbs_customer` c WHERE c.`deptCode` LIKE '{0}%' AND a.`update_time`" \
-    #     #                                   " LIKE '{1}%' AND a.`cus_id`=c.`id`;".format(self.dept, self.date)
-    #     stock_funds_to_be_collected_sql = "SELECT SUM(funds_to_be_collected) FROM `wbs_stock_customer` WHERE dept_code" \
-    #                                       " LIKE '{0}%' AND update_time LIKE '{1}%';".format(self.dept, self.date)
-    #     stock_precipitated_capital_sql = "SELECT SUM(precipitated_capital) FROM `wbs_stock_customer` WHERE dept_code" \
-    #                                       " LIKE '{0}%'AND update_time LIKE '{1}%';".format(self.dept, self.date)
-    #     # asset_funds_to_be_collected = self.exchange_None(self.execute_select(self.cur,asset_funds_to_be_collected_sql)[0][0])
-    #     # asset_precipitated_capital = self.exchange_None(self.execute_select(self.cur,asset_precipitated_capital_sql)[0][0])
-    #     stock_funds_to_be_collected = self.exchange_None(self.execute_select(self.cur,stock_funds_to_be_collected_sql)[0][0])
-    #     stock_precipitated_capital = self.exchange_None(self.execute_select(self.cur,stock_precipitated_capital_sql)[0][0])
-    #     # funds_to_be_collected = asset_funds_to_be_collected + stock_funds_to_be_collected
-    #     # precipitated_capital = asset_precipitated_capital + stock_precipitated_capital
-    #     # return [str(funds_to_be_collected/10000), str(precipitated_capital/10000)]
-    #     return [str(stock_funds_to_be_collected/10000), str(stock_precipitated_capital/10000)]
-
     def funds_amount(self):
         ''' 当日待收总额、当日沉淀总额 '''
         stock_funds_to_be_collected_sql = "SELECT fundsToBeCollected FROM `data_statistics_day` WHERE deptCode" \
-                                          " LIKE '{0}%' AND day LIKE '{1}%';".format(self.dept, self.date)
+                                          " LIKE '{0}%' AND day LIKE '{1}%' AND entId={2};".format(self.dept, self.date, self.ent_id[self.name])
         stock_precipitated_capital_sql = "SELECT precipitatedCapital FROM `data_statistics_day` WHERE deptCode" \
-                                          " LIKE '{0}%'AND day LIKE '{1}%';".format(self.dept, self.date)
+                                          " LIKE '{0}%' AND day LIKE '{1}%' AND entId={2};".format(self.dept, self.date, self.ent_id[self.name])
         stock_funds_to_be_collected = self.exchange_None(self.execute_select(self.sm_cur, stock_funds_to_be_collected_sql)[0][0])
         stock_precipitated_capital = self.exchange_None(self.execute_select(self.sm_cur, stock_precipitated_capital_sql)[0][0])
-        return [str(stock_funds_to_be_collected/10000), str(stock_precipitated_capital/10000)]
+        return [str(stock_funds_to_be_collected), str(stock_precipitated_capital)]
 
     def openaccount_amount(self):
         ''' 当日开户客户数 '''
-        asset_openaccount_amount_today_sql = "SELECT COUNT(1) FROM `wbs_asset_cus_account` a, `wbs_customer` c WHERE" \
-                                             " c.deptCode LIKE '{0}%' AND c.id=a.cus_id AND" \
-                                             " platform_account_opening_time LIKE '{1}%';".format(self.dept, self.date)
         stock_openaccount_amount_today_sql = "SELECT COUNT(1) FROM `wbs_stock_customer` WHERE 1=1 AND dept_code " \
-                                             "LIKE '{1}%' AND deleted=0 AND platform_account_opening_time" \
+                                             "LIKE '{1}%' AND platform_account_opening_time" \
                                              " LIKE '{0}%';".format(self.date, self.dept)
-        asset_openaccount_amount_today = self.exchange_None(self.execute_select(self.cur, asset_openaccount_amount_today_sql)[0][0])
         stock_openaccount_amount_today = self.exchange_None(self.execute_select(self.cur, stock_openaccount_amount_today_sql)[0][0])
-        openaccount_amount_today = asset_openaccount_amount_today + stock_openaccount_amount_today
-        return str(openaccount_amount_today)
+        return str(stock_openaccount_amount_today)
 
     def first_invest_match_count(self):
         ''' 当日首投达标客户数 '''
@@ -185,8 +166,8 @@ class DateCount(Optsql):
         return str(result_deadline_invest)
 
 
-def date_count_main(dept, date):
-    dcm = DateCount(dept, date)
+def date_count_main(dept, date, name):
+    dcm = DateCount(dept, date, name)
     dept_name, the_datetime = dcm.dept_name_date()
     today_amount = dcm.invest_amount()
     today_count = dcm.invest_count()
@@ -240,5 +221,5 @@ def date_count_main(dept, date):
 
 
 if __name__ == '__main__':
-    # date_count_main('SHNMCW0002', '0')
-    date_count_main('SHNMCW0002', '2019-11-20')
+    # date_count_main('SHNMCW0002', '0', 'nami')
+    date_count_main('SHNMCW0013', '2019-12-03', 'nami')
