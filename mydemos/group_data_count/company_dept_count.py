@@ -62,8 +62,8 @@ class DeptCount(Optsql):
 
     def yesterday_performance_amount(self):
         '''昨日投资业绩'''
-        yesterday_amount_sql = "SELECT SUM(performance_amount) FROM `ns_sop_order_snapshot_summary` WHERE " \
-                              "trans_time LIKE '{0}%' AND department_no LIKE '{1}%' {2}" \
+        yesterday_amount_sql = "SELECT SUM(performance_amount) FROM `ns_sop_order_snapshot_summary` WHERE 1=1 AND order_source = 0 " \
+                              "AND trans_time LIKE '{0}%' AND department_no LIKE '{1}%' {2}" \
                               ";".format(self.yesterday, self.dept, self.asset_sql)
         yesterday_amount = self.exchange_None(self.execute_select(self.cur,yesterday_amount_sql)[0][0])
 
@@ -174,13 +174,12 @@ class DeptCount(Optsql):
             self.asset_sql1 = ''
         else:
             self.asset_sql1 = 'and asset = %s' % str(self.asset)
-        stock_openaccount_amount_today_sql = "SELECT COUNT(1) FROM `wbs_stock_customer` WHERE 1=1 AND dept_code " \
+        stock_openaccount_amount_today_sql = "SELECT COUNT(1) FROM `wbs_stock_customer` WHERE 1=1 AND open_fa_dept_code " \
                                              "LIKE '{1}%' AND platform_account_opening_time LIKE '{0}%' " \
                                              "{2};".format(self.today, self.dept, self.asset_sql1)
-        stock_openaccount_amount_yesterday_sql = "SELECT COUNT(1) FROM `wbs_stock_customer` WHERE 1=1 AND dept_code " \
+        stock_openaccount_amount_yesterday_sql = "SELECT COUNT(1) FROM `wbs_stock_customer` WHERE 1=1 AND open_fa_dept_code " \
                                              "LIKE '{1}%' AND platform_account_opening_time LIKE '{0}%' " \
                                              "{2};".format(self.yesterday, self.dept, self.asset_sql1)
-
         stock_openaccount_amount_today = self.exchange_None(self.execute_select(self.cur,stock_openaccount_amount_today_sql)[0][0])
         stock_openaccount_amount_yesterday = self.exchange_None(self.execute_select(self.cur,stock_openaccount_amount_yesterday_sql)[0][0])
 
@@ -345,6 +344,6 @@ def dept_count_main(dept, asset, name):
 
 
 if __name__ == '__main__':
-    dept_count_main('SHNMCW000600010001000100010001', 3, 'nami')
+    dept_count_main('SHNMCW0006', 0, 'nami')
 
 

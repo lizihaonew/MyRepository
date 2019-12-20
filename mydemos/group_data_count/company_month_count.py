@@ -70,10 +70,10 @@ class MonthCount(Optsql):
 
     def performance_amount(self):
         '''当月投资业绩、上月投资业绩'''
-        current_month_amount_sql = "SELECT SUM(performance_amount) FROM `ns_sop_order_snapshot_summary` WHERE " \
-                              "Convert(trans_time,CHAR(20)) LIKE '{0}%' AND department_no LIKE '{1}%';".format(self.current_month, self.dept)
-        last_month_amount_sql = "SELECT SUM(performance_amount) FROM `ns_sop_order_snapshot_summary` WHERE " \
-                                   "Convert(trans_time,CHAR(20)) LIKE '{0}%' AND department_no LIKE '{1}%';".format(self.last_month, self.dept)
+        current_month_amount_sql = "SELECT SUM(performance_amount) FROM `ns_sop_order_snapshot_summary` WHERE 1=1 AND order_source = 0 " \
+                              "AND Convert(trans_time,CHAR(20)) LIKE '{0}%' AND department_no LIKE '{1}%';".format(self.current_month, self.dept)
+        last_month_amount_sql = "SELECT SUM(performance_amount) FROM `ns_sop_order_snapshot_summary` WHERE 1=1 AND order_source = 0 " \
+                                   "AND Convert(trans_time,CHAR(20)) LIKE '{0}%' AND department_no LIKE '{1}%';".format(self.last_month, self.dept)
         current_month_performance_amount = self.exchange_None(self.execute_select(self.cur, current_month_amount_sql)[0][0])
         last_month_performance_amount = self.exchange_None(self.execute_select(self.cur, last_month_amount_sql)[0][0])
         return [str(current_month_performance_amount/10000), str(last_month_performance_amount/10000)]
@@ -112,7 +112,7 @@ class MonthCount(Optsql):
 
     def openaccount_amount(self):
         ''' 当月开户客户数 '''
-        stock_openaccount_amount_current_month_sql = "SELECT COUNT(1) FROM `wbs_stock_customer` WHERE 1=1 AND dept_code " \
+        stock_openaccount_amount_current_month_sql = "SELECT COUNT(1) FROM `wbs_stock_customer` WHERE 1=1 AND open_fa_dept_code " \
                                              "LIKE '{1}%' AND Convert(platform_account_opening_time,CHAR(20))" \
                                              " LIKE '{0}%';".format(self.current_month, self.dept)
         stock_openaccount_amount_current_month = self.exchange_None(self.execute_select(self.cur, stock_openaccount_amount_current_month_sql)[0][0])
@@ -245,4 +245,4 @@ def month_count_main(dept, date, name):
 if __name__ == '__main__':
     # month_count_main('SHNMCW0002', '0')
     # month_count_main('SHNMZX000100010001000100010001', '2019-12', 'nami')
-    month_count_main('SHNMCW000600010001000100010001', '2019-12', 'datang')
+    month_count_main('SHNMCW0006', '2019-12', 'nami')

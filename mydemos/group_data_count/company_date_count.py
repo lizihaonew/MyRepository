@@ -62,8 +62,8 @@ class DateCount(Optsql):
 
     def today_performance_amount(self):
         '''当日投资业绩'''
-        today_amount_sql = "SELECT SUM(performance_amount) FROM `ns_sop_order_snapshot_summary` WHERE " \
-                              "trans_time LIKE '{0}%' AND department_no LIKE '{1}%';".format(self.date, self.dept)
+        today_amount_sql = "SELECT SUM(performance_amount) FROM `ns_sop_order_snapshot_summary` WHERE 1=1 AND order_source = 0 " \
+                              "AND trans_time LIKE '{0}%' AND department_no LIKE '{1}%';".format(self.date, self.dept)
         today_performance_amount = self.exchange_None(self.execute_select(self.cur, today_amount_sql)[0][0])
         return str(today_performance_amount/10000)
 
@@ -101,7 +101,7 @@ class DateCount(Optsql):
 
     def openaccount_amount(self):
         ''' 当日开户客户数 '''
-        stock_openaccount_amount_today_sql = "SELECT COUNT(1) FROM `wbs_stock_customer` WHERE 1=1 AND dept_code " \
+        stock_openaccount_amount_today_sql = "SELECT COUNT(1) FROM `wbs_stock_customer` WHERE 1=1 AND open_fa_dept_code " \
                                              "LIKE '{1}%' AND platform_account_opening_time" \
                                              " LIKE '{0}%';".format(self.date, self.dept)
         stock_openaccount_amount_today = self.exchange_None(self.execute_select(self.cur, stock_openaccount_amount_today_sql)[0][0])
@@ -221,5 +221,5 @@ def date_count_main(dept, date, name):
 
 
 if __name__ == '__main__':
-    # date_count_main('SHNMCW0002', '0', 'nami')
-    date_count_main('SHNMCW0013', '2019-12-03', 'nami')
+    # date_count_main('SHNMCW0006', '0', 'nami')
+    date_count_main('SHNMCW0006', '2019-12-18', 'nami')

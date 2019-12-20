@@ -31,10 +31,10 @@ class UpdateTableTime(Optsql):
                              "'{1}%';".format(self.today, self.date_yesterday)
         ns_order_yesterday_sql = "UPDATE ns_order SET trans_time='{0} 00:00:00' WHERE trans_time LIKE " \
                                  "'{1}%';".format(self.yesterday, self.two_days_ago)
-        # ns_sop_order_snapshot_today_sql = "UPDATE ns_sop_order_snapshot_summary SET trans_time='{0} 00:00:00' WHERE trans_time" \
-        #                                   " LIKE '{1}%';".format(self.today, self.date_yesterday)
-        # ns_sop_order_snapshot_yesterday_sql = "UPDATE ns_sop_order_snapshot_summary SET trans_time='{0} 00:00:00' WHERE " \
-        #                                       "trans_time LIKE '{1}%';".format(self.yesterday, self.two_days_ago)
+        ns_sop_order_snapshot_today_sql = "UPDATE ns_sop_order_snapshot_summary SET trans_time='{0} 00:00:00' WHERE trans_time" \
+                                          " LIKE '{1}%';".format(self.today, self.date_yesterday)
+        ns_sop_order_snapshot_yesterday_sql = "UPDATE ns_sop_order_snapshot_summary SET trans_time='{0} 00:00:00' WHERE " \
+                                              "trans_time LIKE '{1}%';".format(self.yesterday, self.two_days_ago)
         actual_exit_time_today_sql = "UPDATE wbs_received_payment SET actual_exit_time='{0} 00:00:00' WHERE " \
                                      "actual_exit_time LIKE '{1}%';".format(self.today, self.date_yesterday)
         actual_exit_time_yesterday_sql = "UPDATE wbs_received_payment SET actual_exit_time='{0} 00:00:00' WHERE " \
@@ -51,12 +51,6 @@ class UpdateTableTime(Optsql):
                                   "LIKE '{1}%';".format(self.today, self.date_yesterday)
         recharge_time_yesterday_sql = "UPDATE ns_recharge_record SET recharge_time='{0} 00:00:00' WHERE recharge_time" \
                                       " LIKE '{1}%';".format(self.yesterday, self.two_days_ago)
-        account_opening_time_today_sql = "UPDATE wbs_asset_cus_account SET platform_account_opening_time=" \
-                                         "'{0} 00:00:00' WHERE platform_account_opening_time LIKE " \
-                                         "'{1}%';".format(self.today, self.date_yesterday)
-        account_opening_time_yesterday_sql = "UPDATE wbs_asset_cus_account SET platform_account_opening_time=" \
-                                             "'{0} 00:00:00' WHERE platform_account_opening_time LIKE " \
-                                             "'{1}%';".format(self.yesterday, self.two_days_ago)
         stock_customer_today_sql = "UPDATE wbs_stock_customer SET platform_account_opening_time='{0} 00:00:00' " \
                                    "WHERE platform_account_opening_time LIKE '{1}%';".format(self.today, self.date_yesterday)
         stock_customer_yesterday_sql = "UPDATE wbs_stock_customer SET platform_account_opening_time='{0} 00:00:00'" \
@@ -69,10 +63,10 @@ class UpdateTableTime(Optsql):
         print('%s update successful!!!' % 'ns_order_today_sql' + '===' + str(res))
         res = self.update_table(ns_order_yesterday_sql)
         print('%s update successful!!!' % 'ns_order_yesterday_sql' + '===' + str(res))
-        # res = self.update_table(ns_sop_order_snapshot_today_sql)
-        # print('%s update successful!!!' % 'ns_sop_order_snapshot_today_sql' + '===' + str(res))
-        # res = self.update_table(ns_sop_order_snapshot_yesterday_sql)
-        # print('%s update successful!!!' % 'ns_sop_order_snapshot_yesterday_sql' + '===' + str(res))
+        res = self.update_table(ns_sop_order_snapshot_today_sql)
+        print('%s update successful!!!' % 'ns_sop_order_snapshot_today_sql' + '===' + str(res))
+        res = self.update_table(ns_sop_order_snapshot_yesterday_sql)
+        print('%s update successful!!!' % 'ns_sop_order_snapshot_yesterday_sql' + '===' + str(res))
         res = self.update_table(actual_exit_time_today_sql)
         print('%s update successful!!!' % 'actual_exit_time_today_sql' + '===' + str(res))
         res = self.update_table(actual_exit_time_yesterday_sql)
@@ -89,10 +83,6 @@ class UpdateTableTime(Optsql):
         print('%s update successful!!!' % 'recharge_time_today_sql' + '===' + str(res))
         res = self.update_table(recharge_time_yesterday_sql)
         print('%s update successful!!!' % 'recharge_time_yesterday_sql' + '===' + str(res))
-        res = self.update_table(account_opening_time_today_sql)
-        print('%s update successful!!!' % 'account_opening_time_today_sql' + '===' + str(res))
-        res = self.update_table(account_opening_time_yesterday_sql)
-        print('%s update successful!!!' % 'account_opening_time_yesterday_sql' + '===' + str(res))
         res = self.update_table(stock_customer_today_sql)
         print('%s update successful!!!' % 'stock_customer_today_sql' + '===' + str(res))
         res = self.update_table(stock_customer_yesterday_sql)
