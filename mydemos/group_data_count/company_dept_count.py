@@ -344,6 +344,6 @@ def dept_count_main(dept, asset, name):
 
 
 if __name__ == '__main__':
-    dept_count_main('SHNMCW0006', 0, 'nami')
+    dept_count_main('SHNMCW000600010001', 3, 'nami')
 
 

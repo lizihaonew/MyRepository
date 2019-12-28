@@ -245,4 +245,4 @@ def month_count_main(dept, date, name):
 if __name__ == '__main__':
     # month_count_main('SHNMCW0002', '0')
     # month_count_main('SHNMZX000100010001000100010001', '2019-12', 'nami')
-    month_count_main('SHNMCW0006', '2019-12', 'nami')
+    month_count_main('SHNMCW0006', '2019-11', 'nami')

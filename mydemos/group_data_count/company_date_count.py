@@ -222,4 +222,4 @@ def date_count_main(dept, date, name):
 
 if __name__ == '__main__':
     # date_count_main('SHNMCW0006', '0', 'nami')
-    date_count_main('SHNMCW0006', '2019-12-18', 'nami')
+    date_count_main('SHNMCW00060001', '2019-12-19', 'nami')
