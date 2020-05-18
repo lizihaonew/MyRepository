@@ -146,7 +146,7 @@ def group_date_count_main(dept, date, name):
 
 if __name__ == '__main__':
     # group_date_count_main(部门, 日期, 公司)
-    group_date_count_main('0', '2019-12-04', 'nami')
+    group_date_count_main('0', '2019-12-19', 'nami')
     # group_date_count_main('0', '2019-12-03', 'datang')
 
 
