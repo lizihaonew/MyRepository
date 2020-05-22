@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>批量上传文件</title>
+</head>
+<body>
+<form action="{% url 'app:uploadfiles' %}" method="post" enctype="multipart/form-data">
+
+    {% csrf_token %}
+    <span>用户名：</span><input type="text" name="username" placeholder="请输入用户名">
+    <br>
+    <span>脚本文件：</span><input type="file" name="script_file" multiple="">
+    <br>
+    <span>数据文件：</span><input type="file" name="data_files" multiple="">
+
+{#    <span class="pln" style="font-family:Arial,宋体;font-size:12px;"> </span><span class="tag" style="font-family:Arial,宋体;font-size:12px;color:#8000;"><input</span><span class="pln" style="font-family:Arial,宋体;font-size:12px;"> </span><span class="atn" style="font-family:Arial,宋体;font-size:12px;color:#ff00;">type</span><span class="pun" style="font-family:Arial,宋体;font-size:12px;">=</span><span class="atv" style="font-family:Arial,宋体;font-size:12px;color:#00ff;">"file"</span><span class="pln" style="font-family:Arial,宋体;font-size:12px;"> </span><span class="atn" style="font-family:Arial,宋体;font-size:12px;color:#ff00;">name</span><span class="pun" style="font-family:Arial,宋体;font-size:12px;">=</span><span class="atv" style="font-family:Arial,宋体;font-size:12px;color:#00ff;">"myfiles"</span><span class="pln" style="font-family:Arial,宋体;font-size:12px;"> </span><span class="atn" style="font-family:Arial,宋体;font-size:12px;color:#ff00;">multiple</span><span class="pun" style="font-family:Arial,宋体;font-size:12px;">=</span><span class="atv" style="font-family:Arial,宋体;font-size:12px;color:#00ff;">""</span><span class="tag" style="font-family:Arial,宋体;font-size:12px;color:#8000;">></span>#}
+
+    <br>
+    <button>提交</button>
+
+</form>
+</body>
+</html>
