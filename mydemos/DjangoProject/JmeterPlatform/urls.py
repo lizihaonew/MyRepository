@@ -12,4 +12,6 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('uploadfiles/', views.upload_files, name='uploadfiles'),
     path('filelist/', views.file_list, name='filelist'),
+    path('downloadfile/', views.download_file, name='downloadfile'),
+    path('deletefile/', views.delete_file, name='deletefile'),
 ]
