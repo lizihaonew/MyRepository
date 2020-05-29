@@ -7,8 +7,12 @@ from django.http import HttpResponse,HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
 import shutil
-from App.models import Grade, Student, Script, Data
+
+from App import models
+from App.models import Grade, Student, Script, Data, UserType
 from DjangoModels.settings import MEDIA_ROOT
+from django.apps import apps
+
 
 base_path = r'D:\PythonFile\DjangoTests\DjangoModels\App\static\\'
 response_data = {
@@ -22,7 +26,7 @@ def response(data):
     return HttpResponse(data, content_type="application/json,charset=utf-8")
 
 
-def index(request):
+def index_hello(request):
     return HttpResponse('Hello Django')
 
 
@@ -253,3 +257,93 @@ def download_file(request):
     shutil.copy(download_path, s_file_path)
 
     return HttpResponse(s_file_name)
+
+
+def getmodelfield(request):
+    appname, modelname = 'App', 'Script'
+    modelobj = apps.get_model(appname, modelname)
+    fields = modelobj._meta.fields
+    verbose_name = fields[0].verbose_name
+    verbose_name1 = fields[1].verbose_name
+    verbose_name2 = fields[2].verbose_name
+    verbose_name3 = fields[3].verbose_name
+    verbose_name4 = fields[4].verbose_name
+    print(verbose_name)
+    print(verbose_name1)
+    print(verbose_name2)
+    print(verbose_name3)
+    print(verbose_name4)
+    return HttpResponse(verbose_name)
+
+
+def delete_data(request):
+    user_type = UserType.objects.filter(pk=1)
+    user_type.delete()
+    return None
+
+
+# def index(request):
+#     # 创建用户类型表数据
+#     # models.UserType.objects.create(caption='管理员')
+#     # models.UserType.objects.create(caption='普通用户')
+#     # models.UserType.objects.create(caption='超级管理员')
+#
+#     # 创建用户表数据
+#     user_info_dict_1 = {
+#         'user': 'Alex1',
+#         'email': 'alex@123.com',
+#         'pwd': '123',
+#         'user_type': models.UserType.objects.get(caption='普通用户')
+#     }
+#
+#     user_info_dict_2 = {
+#         'user': 'eric2',
+#         'email': 'eric@qq.com',
+#         'pwd': '123',
+#         'user_type_id': 10
+#     }
+#
+#     models.UserInfo.objects.create(**user_info_dict_1)
+#     models.UserInfo.objects.create(**user_info_dict_2)
+#     print('yes')
+#
+#     return HttpResponse('操作成功！！')
+
+
+def index(request):
+    user_model = models.UserInfo.objects.filter(pwd='123', user_type_id=10)
+    print(user_model)
+    print('==============')
+    all_list = user_model.values()
+    print(all_list)
+    print('==============')
+    user_list = user_model.values('user')
+    print(user_list)
+    print('==============')
+    for i in user_list:
+        print(i)
+    # user_list = [i.user for i in user_model]
+    return HttpResponse(str(user_list))
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

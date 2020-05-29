@@ -7,6 +7,7 @@ from django.contrib import admin
 from django.urls import path
 
 from JmeterPlatform import views
+from JmeterPlatform.allviews import task_view as tv
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -14,4 +15,5 @@ urlpatterns = [
     path('filelist/', views.file_list, name='filelist'),
     path('downloadfile/', views.download_file, name='downloadfile'),
     path('deletefile/', views.delete_file, name='deletefile'),
+    path('addtask/', views.add_task),
 ]

@@ -7,7 +7,7 @@ from django.urls import path, re_path
 from App import views
 
 urlpatterns = [
-    path('index/', views.index),
+    path('indexhello/', views.index_hello),
     # re_path(r'^students', views.students),
     re_path(r'^student/$', views.get_student),
     re_path(r'^student/(\d+)/', views.student),
@@ -28,5 +28,8 @@ urlpatterns = [
     path('uploadfiles/', views.upload_files, name='uploadfiles'),
     path('filelist/', views.file_list, name='filelist'),
     re_path(r'downloadfile/', views.download_file, name='downloadfile'),
+    re_path(r'getmodelfield/', views.getmodelfield, name='getmodelfield'),
+    re_path(r'deletedata/', views.delete_data, name='deletedata'),
+    path('index/', views.index)
 
 ]

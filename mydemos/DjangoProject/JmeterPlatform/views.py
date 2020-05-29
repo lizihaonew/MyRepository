@@ -130,7 +130,7 @@ def download_file(request):
     d_file_path = os.path.join(MEDIA_ROOT, 'upload\\JmeterData', script_name)
     data_download_path = script_download_path + '\\data'
     d_model = s_model.d_script
-    d_file_list =[d.d_file for d in d_model.all()]
+    d_file_list = [d.d_file for d in d_model.all()]
     if not os.path.exists(script_download_path):
         os.makedirs(script_download_path, mode=0o777)
         os.makedirs(data_download_path, mode=0o777)
@@ -174,4 +174,13 @@ def delete_file(request):
     response_data['data'] = "文件%s及其数据文件已经删除" % s_file_name
 
     return response(response_data)
+
+
+def add_task(request):
+    task_name = request.GET.get('task_name')
+    response_data['message'] = '操作成功'
+    response_data['data'] = task_name
+    return response(response_data)
+
+
 

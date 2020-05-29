@@ -23,3 +23,29 @@ class Data(models.Model):
     d_script = models.ForeignKey(Script, on_delete=models.CASCADE)
 
 
+class UserType(models.Model):
+    nid = models.AutoField(primary_key=True)
+    caption = models.CharField(max_length=16)
+
+    class Meta:
+        db_table = 'user_type'
+
+
+class UserInfo(models.Model):
+    # CharFiled类型不能为空，最好要指定一个长度
+    user = models.CharField(max_length=32)
+    email = models.EmailField(max_length=32)
+    pwd = models.CharField(max_length=32)
+    user_type = models.ForeignKey(UserType, on_delete=models.CASCADE, related_name='type_user')
+    create_time = models.DateTimeField(auto_now_add=True, verbose_name=u'创建时间')
+
+    class Meta:
+        db_table = 'user_info'
+
+
+
+
+
+
+
+
