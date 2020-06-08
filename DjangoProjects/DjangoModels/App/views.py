@@ -311,19 +311,44 @@ def delete_data(request):
 
 
 def index(request):
-    user_model = models.UserInfo.objects.filter(pwd='123', user_type_id=10)
-    print(user_model)
-    print('==============')
-    all_list = user_model.values()
-    print(all_list)
-    print('==============')
-    user_list = user_model.values('user')
-    print(user_list)
-    print('==============')
-    for i in user_list:
+    # user_info_dict_1 = {
+    #     'user': 'Merry',
+    #     'email': 'merry@qq.com',
+    #     'pwd': '123',
+    #     'user_type_id': models.UserType.objects.get(caption='管理员').nid
+    # }
+    # models.UserInfo.objects.create(**user_info_dict_1)
+    #
+    # user_info_dict_2 = {
+    #     'user': 'Lili',
+    #     'email': 'Lili@qq.com',
+    #     'pwd': '123',
+    #     'user_type_id': models.UserType.objects.get(caption='超级管理员').nid
+    # }
+    # models.UserInfo.objects.create(**user_info_dict_2)
+
+    # user_set = models.UserType.objects.get(caption='管理员')
+    # print(user_set)
+    # print(user_set.nid)
+    # print(user_set.caption)
+
+    type_set = models.UserType.objects.all()
+    print(type_set)
+    print(type_set.first())
+    print(type_set.last())
+    all_values = type_set.values()
+    print(all_values)
+    all_values_list = type_set.values_list()
+    print(all_values_list)
+    for i in all_values_list:
         print(i)
-    # user_list = [i.user for i in user_model]
-    return HttpResponse(str(user_list))
+
+    all_values = type_set.values('nid')
+    print(all_values)
+    all_values_list = type_set.values_list('nid')
+    print(all_values_list)
+
+    return HttpResponse('success')
 
 
 

@@ -7,6 +7,8 @@ class Script(models.Model):
     s_file_name = models.CharField(max_length=100, verbose_name=u'脚本名称')
     s_file = models.CharField(max_length=100, verbose_name=u'脚本路径')
     create_time = models.DateTimeField(auto_now_add=True)
+    update_time = models.DateTimeField(auto_now=True)
+    deleted = models.BooleanField(blank=True)
 
     class Meta:
         db_table = 'script'

@@ -4,7 +4,7 @@ import json
 import os
 import random
 
-from django.http import HttpResponse, HttpResponseRedirect, FileResponse
+from django.http import HttpResponse, HttpResponseRedirect, FileResponse, JsonResponse
 from django.shortcuts import render
 from django.urls import reverse
 import shutil
@@ -181,6 +181,29 @@ def add_task(request):
     response_data['message'] = '操作成功'
     response_data['data'] = task_name
     return response(response_data)
+
+
+def json_response(request):
+    data = {
+        'errCode': 200,
+        'errMessage': 'ok',
+        'data': {
+            'users': [
+                {
+                    'name': 'Tom',
+                    'age': 20
+                },
+                {
+                    'name': 'Jerry',
+                    'age': 18
+                }
+            ]
+        }
+    }
+    res = JsonResponse(data=data)
+    res.status_code = 404
+    return res
+
 
 
 
