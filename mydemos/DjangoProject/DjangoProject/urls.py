@@ -18,5 +18,6 @@ from django.urls import path, include
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('jmeter/', include(('JmeterPlatform.urls', 'JmeterPlatform'), namespace='jmeter'))
+    path('jmeter/', include(('JmeterPlatform.urls', 'JmeterPlatform'), namespace='jmeter')),
+    path('stress/', include('stressrunner.urls')),
 ]
