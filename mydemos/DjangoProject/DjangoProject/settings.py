@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'JmeterPlatform.apps.JmeterplatformConfig',
     'stressrunner',
+    'stress_agent',
 ]
 
 MIDDLEWARE = [
@@ -78,10 +79,16 @@ WSGI_APPLICATION = 'DjangoProject.wsgi.application'
 
 DATABASES = {
     'default': {
-        # 'ENGINE': 'django.db.backends.sqlite3',
-        # 'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'jmeterplatform',
+        'NAME': 'autotest_platform',
+        'USER': 'root',
+        'PASSWORD': 'root',
+        'HOST': 'localhost',
+        'PORT': 3306,
+    },
+    'mysql02': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'test_database',
         'USER': 'root',
         'PASSWORD': 'root',
         'HOST': 'localhost',
@@ -89,6 +96,11 @@ DATABASES = {
     }
 }
 
+DATABASE_ROUTERS = ['DjangoProject.database_router.DatabaseAppsRouter']
+DATABASE_APPS_MAPPING = {
+    'stressrunner': 'default',
+    'JmeterPlatform': 'mysql02',
+}
 
 # Password validation
 # https://docs.djangoproject.com/en/3.0/ref/settings/#auth-password-validators
@@ -128,3 +140,6 @@ USE_TZ = False
 
 STATIC_URL = '/static/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'static\\')
+
+# JS_AGENT_HOST = "http://127.0.0.1:9990"
+JS_AGENT_HOST = "http://192.168.147.128:9990"

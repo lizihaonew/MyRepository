@@ -20,4 +20,6 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('jmeter/', include(('JmeterPlatform.urls', 'JmeterPlatform'), namespace='jmeter')),
     path('stress/', include('stressrunner.urls')),
+    path('js/', include('stress_agent.urls')),
+
 ]
