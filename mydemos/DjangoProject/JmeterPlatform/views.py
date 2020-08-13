@@ -11,7 +11,7 @@ import shutil
 import zipfile
 from DjangoProject.settings import MEDIA_ROOT
 from JmeterPlatform import models
-from JmeterPlatform.models import Data, Script
+from JmeterPlatform.models import Data, Script, Person, PersonInfo, Author, Book, Child, Colors
 
 response_data = {
     'message': '',
@@ -203,6 +203,87 @@ def json_response(request):
     res = JsonResponse(data=data)
     res.status_code = 404
     return res
+
+
+# def my_script(request):
+    # # 普通查询方式
+    # person_set = Person.objects.all().first()
+    # info_set = PersonInfo.objects.filter(person=person_set)
+    # print('person_set', person_set.name)
+    # print('info_set', info_set[0].birth)
+    #
+    # # 关联查询，正查，即先查主表，通过主表数据关联从表数据
+    # person_set2 = Person.objects.all().first()
+    # personInfo = person_set2.personinfo     # personinfo是PersonInfo模型类的小写
+    # print(personInfo.birth)
+    #
+    # # 关联查询，反查，即先查从表，通过从表数据关联出主表数据
+    # info_set3 = PersonInfo.objects.filter(tel='13000000001').first()
+    # person_set3 = info_set3.person
+    # print(person_set3.name)
+    #
+    # person_obj4 = Person.objects.create(
+    #     name='person4',
+    #     age=20
+    # )
+    # person_obj4.save()
+    # info_obj4 = PersonInfo.objects.create(
+    #     sex=1,
+    #     birth='2020-10-11',
+    #     tel='13000000004',
+    #     person=person_obj4
+    # )
+    # info_obj4.save()
+    # print(info_obj4.tel)
+
+    # person_obj5 = Person.objects.all().first()
+    # info_obj5 = person_obj5.personinfo
+    # print(info_obj5.tel)
+    #
+    # person_obj6 = Person.objects.all().last()
+    # info_obj6 = person_obj6.info
+    # print(info_obj6.tel)
+    # return HttpResponse('ok')
+
+
+# def my_script(request):
+#     author_obj = Author.objects.create(
+#         name='author1',
+#         age=20
+#     )
+#     author_obj.save()
+#
+#     for i in range(3):
+#         book_obj = Book.objects.create(
+#             book_name='book_%s' % str(i),
+#             page=i * 20,
+#             author=author_obj
+#         )
+#         book_obj.save()
+#
+#     # 正向查询
+#     author_obj = Author.objects.all().first()
+#     book_set = author_obj.book.all()
+#     for book_obj in book_set:
+#         print(book_obj.book_name)
+#
+#     # 反向查询
+#     book_obj2 = Book.objects.first()
+#     author_obj2 = book_obj2.author
+#     print(author_obj2.name)
+#
+#     return HttpResponse('ok')
+
+
+def my_script(request):
+    # 写法1：
+    child_obj = models.Child.objects.get(name="小明")  # 写法：子表对象.子表多对多字段.过滤条件(all()/filter())
+    print(child_obj.favor.all())
+    # 写法2，反向从母表入手：
+    print(models.Colors.objects.filter(child__name="小明"))  # 母表对象.filter(子表表名小写__子表字段名="过滤条件")
+
+    return HttpResponse('ok')
+
 
 
 

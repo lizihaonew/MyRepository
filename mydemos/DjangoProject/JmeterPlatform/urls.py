@@ -17,4 +17,5 @@ urlpatterns = [
     path('deletefile', views.delete_file, name='deletefile'),
     path('addtask', views.add_task),
     path('jsonrp', views.json_response),
+    path('myscript', views.my_script),
 ]
