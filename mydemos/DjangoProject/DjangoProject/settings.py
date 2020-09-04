@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'JmeterPlatform.apps.JmeterplatformConfig',
     'stressrunner',
     'stress_agent',
+    'xmind_testcase',
 ]
 
 MIDDLEWARE = [
