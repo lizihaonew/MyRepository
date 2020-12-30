@@ -11,7 +11,7 @@ BASE_PATH = os.path.dirname(os.path.abspath(__file__))
 
 
 # 获取所有已连接设备UUID
-def get_devices():
+def get_devices():                          
     command = "idevice_id -l"
     res = os.popen(command).read()
     devices = list(filter(None, res.split("\n")))
