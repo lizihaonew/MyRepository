@@ -1,0 +1,9 @@
+.DS_Store
+.idea/*
+*.pyc
+.cache
+*.png
+*.log
+*.jpeg
+*.gif
+*.jpg

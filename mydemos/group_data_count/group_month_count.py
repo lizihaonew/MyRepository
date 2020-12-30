@@ -10,7 +10,7 @@ from opt_group_mysql import Optsql
 
 
 class GroupMonthCount(Optsql):
-    def __init__(self, dept, date, name):
+    def __init__(self, date, name, dept='0'):
         self.dept = dept
         self.name = name
         self.cur, self.conn = self.conn_mysql("shengmei")
@@ -128,8 +128,8 @@ class GroupMonthCount(Optsql):
         return [currentMonthInvestAmount, lastMonthInvestAmount, investAmountLinkRelativeRatio, currentMonthInvestCount, currentMonthInvestPerformance, lastMonthInvestPerformance, investPerformanceLinkRelativeRatio, currentMonthReceivedPayment, currentMonthCashout, currentMonthCashoutProportion, currentMonthRecharge, currentMonthRechargeInvestProportion, currentMonthReceivedInvest, currentMonthReceivedInvestProportion, currentMonthNetCapital, fundsToBeCollected, precipitatedCapital, currentMonthOpeningAccountCount, currentMonthFirstInvestCount, str(currentMonthProductTypeInvestAmount), str(currentMonthDeadlineInvestAmount)]
 
 
-def group_month_count_main(dept, date, name):
-    gmcm = GroupMonthCount(dept, date, name)
+def group_month_count_main(date, name, dept='0'):
+    gmcm = GroupMonthCount(date, name)
     the_date, the_dept, ent_name = gmcm.get_dept_date()
     if dept == '0':
         res = gmcm.company_count()
@@ -162,6 +162,6 @@ def group_month_count_main(dept, date, name):
 
 
 if __name__ == '__main__':
-    # group_month_count_main(部门, 日期, 公司)
-    # group_month_count_main('0', '2019-12', 'nami')
-    group_month_count_main('0', '2019-12', 'datang')
+    # group_month_count_main(日期, 公司, 部门)
+    group_month_count_main('2019-12', 'nami')
+    # group_month_count_main('2019-12', 'datang')

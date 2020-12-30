@@ -32,10 +32,10 @@ class EmployeeCount(Optsql):
     def employee_information(self):
         ''' 员工姓名、手机号、部门 '''
         employee_mobile = self.mobile
-        employee_information_sql = "SELECT e.name,d.name FROM `wbs_employee` e, `wbs_department` d WHERE " \
+        employee_information_sql = "SELECT e.id,e.name,d.name FROM `wbs_employee` e, `wbs_department` d WHERE " \
                                    "e.mobile = '{0}' AND e.dismissionDate IS NULL AND e.`deptCode`=d.code;".format(self.mobile)
-        employee_name, employee_dept = self.execute_select(self.cur, employee_information_sql)[0]
-        return [employee_name, employee_mobile, employee_dept]
+        employee_id, employee_name, employee_dept = self.execute_select(self.cur, employee_information_sql)[0]
+        return [employee_id, employee_name, employee_mobile, employee_dept]
 
     def invest_amount(self):
         '''本日投资总额、昨日投资总额'''
@@ -47,8 +47,8 @@ class EmployeeCount(Optsql):
 
     def yesterday_performance_amount(self):
         '''昨日投资业绩'''
-        yesterday_amount_sql = "SELECT sum(performance_amount) FROM ns_sop_order_snapshot_summary WHERE advisor_id={0} AND " \
-                               "trans_time LIKE '{1}%';".format(self.fa_id,self.yesterday)
+        yesterday_amount_sql = "SELECT sum(performance_amount) FROM ns_sop_order_snapshot_summary WHERE advisor_id={0} AND order_source = 0" \
+                               " AND trans_time LIKE '{1}%';".format(self.fa_id,self.yesterday)
         yesterday_performance_amount = self.exchange_None(self.execute_select(self.cur,yesterday_amount_sql)[0][0])
         return str(yesterday_performance_amount/10000)
 
@@ -71,23 +71,13 @@ class EmployeeCount(Optsql):
 
     def openaccount_amount(self):
         ''' 本日累计开户数、昨日累计开户数 '''
-        asset_openaccount_amount_today_sql = "SELECT COUNT(1) FROM wbs_asset_cus_account a, wbs_customer c WHERE " \
-                                             "c.faId={0} AND a.cus_id=c.id AND platform_account_opening_time LIKE " \
-                                             "'{1}%';".format(self.fa_id, self.today)
-        asset_openaccount_amount_yesterday_sql = "SELECT COUNT(1) FROM wbs_asset_cus_account a, wbs_customer c WHERE " \
-                                             "c.faId={0} AND a.cus_id=c.id AND platform_account_opening_time LIKE " \
-                                             "'{1}%';".format(self.fa_id, self.yesterday)
-        stock_openaccount_amount_today_sql = "SELECT COUNT(1) FROM wbs_stock_customer WHERE fa_id={0} AND deleted=0 " \
-                                             "AND platform_account_opening_time LIKE '{1}%';".format(self.fa_id, self.today)
-        stock_openaccount_amount_yesterday_sql = "SELECT COUNT(1) FROM wbs_stock_customer WHERE fa_id={0} AND deleted=0 " \
-                                             "AND platform_account_opening_time LIKE '{1}%';".format(self.fa_id, self.yesterday)
-        asset_openaccount_amount_today = self.exchange_None(self.execute_select(self.cur,asset_openaccount_amount_today_sql)[0][0])
-        asset_openaccount_amount_yesterday = self.exchange_None(self.execute_select(self.cur,asset_openaccount_amount_yesterday_sql)[0][0])
+        stock_openaccount_amount_today_sql = "SELECT COUNT(1) FROM wbs_stock_customer WHERE open_fa_id={0} AND " \
+                                             "platform_account_opening_time LIKE '{1}%';".format(self.fa_id, self.today)
+        stock_openaccount_amount_yesterday_sql = "SELECT COUNT(1) FROM wbs_stock_customer WHERE open_fa_id={0} " \
+                                                 "AND platform_account_opening_time LIKE '{1}%';".format(self.fa_id, self.yesterday)
         stock_openaccount_amount_today = self.exchange_None(self.execute_select(self.cur,stock_openaccount_amount_today_sql)[0][0])
         stock_openaccount_amount_yesterday = self.exchange_None(self.execute_select(self.cur,stock_openaccount_amount_yesterday_sql)[0][0])
-        openaccount_amount_today = asset_openaccount_amount_today + stock_openaccount_amount_today
-        openaccount_amount_yesterday = asset_openaccount_amount_yesterday + stock_openaccount_amount_yesterday
-        return [str(openaccount_amount_today), str(openaccount_amount_yesterday)]
+        return [str(stock_openaccount_amount_today), str(stock_openaccount_amount_yesterday)]
 
     def first_invest_match_count(self):
         ''' 本月首投达标客户数、本日累计首投达标客户数'''
@@ -120,7 +110,7 @@ class EmployeeCount(Optsql):
 
 def employee_count_main(mobile, name):
     ec = EmployeeCount(mobile, name)
-    employee_name, employee_mobile, employee_dept = ec.employee_information()
+    employee_id, employee_name, employee_mobile, employee_dept = ec.employee_information()
     today_amount, yesterday_amount = ec.invest_amount()
     yesterday_performance_amount = ec.yesterday_performance_amount()
     today_count, yesterday_count = ec.invest_count()
@@ -130,7 +120,7 @@ def employee_count_main(mobile, name):
 
     ec.object_close()
 
-    comment = '销售快报 - 按照员工统计，统计结果如下：' + '( 员工：%s, 手机号：%s，部门：%s )' % (employee_name, employee_mobile, employee_dept) + '\n' \
+    comment = '销售快报 - 按照员工统计，统计结果如下：' + '( 员工(id)：{1}({0}), 手机号：{2}，部门：{3} )'.format(employee_id, employee_name, employee_mobile, employee_dept) + '\n' \
         '本日投资总额：' + today_amount + '\n' \
         '昨日投资总额：' + yesterday_amount + '\n' \
         '昨日投资业绩：' + yesterday_performance_amount + '\n' \
@@ -147,4 +137,4 @@ def employee_count_main(mobile, name):
 
 
 if __name__ == '__main__':
-    employee_count_main('16666666666', 'datang')
+    employee_count_main('13999999991', 'nami')

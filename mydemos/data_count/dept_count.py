@@ -324,10 +324,10 @@ def dept_count_main(dept, asset):
 
     comment = '销售快报 - 按照部门统计，统计结果如下：' + '(部门：%s, 资产端：%s)'%(dept_name, asset_name) + '\n'\
         '本日投资总额：' + today_amount + '\n'\
-        '昨日投资总额：' + yesterday_amount + '\n'\
-        '昨日投资业绩：' + yesterday_performance_amount + '\n'\
-        '本日投资笔数：' + today_count + '\n'\
+        '昨日投资总额：' + yesterday_amount + '\n' \
+        '昨日投资业绩：' + yesterday_performance_amount + '\n' \
         '昨日投资笔数：' + yesterday_count + '\n'\
+        '本日投资笔数：' + today_count + '\n' \
         '本月累计已还款：' + current_month_actual_exit_amount + '\n'\
         '本月累计待还款：' + current_month_expected_exit_amount + '\n'\
         '本月累计提现：' + cashout_current_month + '\n'\
@@ -355,7 +355,7 @@ def dept_count_main(dept, asset):
 
 
 if __name__ == '__main__':
-    dept_count_main('SHNMZX000100010001000100010001', 0)
+    dept_count_main('SHNMCW0006', 0)
     # dept_count_main('SHNMCW0002', 3)
     # dcc = DeptCount('SHNMCW0002', 3)
     # print(dcc.type_invest_amount())

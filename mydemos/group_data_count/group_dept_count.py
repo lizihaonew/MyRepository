@@ -110,6 +110,7 @@ class GroupDeptCount(Optsql):
             todayCashoutProportion = '0'
         else:
             todayCashoutProportion = str('%.4f%%' % eval(todayCashout+'/'+str(exit_amount_today/10000) + '*100'))
+
         if exit_amount_yesterday == 0:
             yesterdayCashoutProportion = '0'
         else:
@@ -210,5 +211,3 @@ def group_dept_count_main(dept, asset, name):
 if __name__ == '__main__':
     # group_dept_count_main(部门, 资产端, 公司)
     group_dept_count_main('0', 0, 'nami')
-    # group_dept_count_main('0', 1, 'datang')
-    # group_dept_count_main('0', 3, 'datang')
