@@ -15,8 +15,7 @@ config.read('config.conf', encoding='utf-8-sig')
 section = 'DEFAULT'
 device_name = config.get(section, 'device_name')
 app = config.get(section, 'app')
-usenew_wda = eval(config.get(section, 'usenew_wda'))
-is_realdevice = eval(config.get(section, 'is_realdevice'))
+bundleId = config.get(section, 'bundleId')
 udid = config.get(section, 'udid')
 appium_host = config.get(section, 'appium_host')
 appium_port = config.get(section, 'appium_port')
@@ -29,26 +28,23 @@ run_time = int(config.get(section, 'run_time'))
 
 
 class IOSMonkey:
-    def __init__(self, devicename, app_path=None, usenewwda=False, realdevice=False, device_udid=""):
+    def __init__(self, devicename, app_path=None, bundle_id=None, device_udid=None):
         self.device_name = devicename
         self.app = app_path
-        self.is_usenew = usenewwda
         self.udid = device_udid
-        self.is_realdevice = realdevice
 
         desired_caps = dict()
         desired_caps['platformName'] = 'IOS'
         desired_caps['deviceName'] = self.device_name
         desired_caps['app'] = self.app
         desired_caps['automationName'] = 'XCUITest'
-        desired_caps['useNewWDA'] = self.is_usenew
-        desired_caps['bundleId'] = 'com.dangdang.iphone'
+        desired_caps['bundleId'] = bundle_id
         desired_caps['platformVersion'] = '11.0'
-        desired_caps["udid"] = '871877d00ea5cf3f189a5eeeb1365babdbc9a3ad'
-        if self.is_realdevice:
-            desired_caps["xcodeOrgId"] = "ZTW9XPA927"
-            desired_caps["xcodeSigningId"] = "iPhone Developer"
-            desired_caps["udid"] = self.udid
+        desired_caps["udid"] = device_udid
+        desired_caps["xcodeOrgId"] = "ZTW9XPA927"
+        desired_caps["xcodeSigningId"] = "iPhone Developer"
+        desired_caps["udid"] = self.udid
+
         try:
             print(desired_caps)
             host = 'http://%s:%s/wd/hub' % (appium_host, appium_port)
@@ -113,7 +109,6 @@ class IOSMonkey:
                 duration=1000)
 
     def save_screenshot(self, ss_path):
-
         if self.driver is not None:
             try:
                 pic_name = self.device_name+datetime.now().strftime('%y%m%d%H%M%S') + \
@@ -125,27 +120,10 @@ class IOSMonkey:
 
 
 def main():
-    config_message = '''
-            Config Message:
-            device_name = {0}
-            app = {1}
-            usenew_wda = {2}
-            is_realdevice = {3}
-            udid = {4}
-            appium_host = {5}
-            appium_port = {6}
-            screenshot = {7}
-            image_path = {8}
-            run_time = {12}
-            percentage_tap = {9}
-            percentage_swipe = {10}
-            percentage_swipe_down = {11}
-            '''.format(device_name, app, usenew_wda, is_realdevice, udid, appium_host, appium_port, screenshot,
-                       image_path, percentage_tap, percentage_swipe, percentage_swipe_down, run_time)
-    print(config_message)
-
-    ios_monkey = IOSMonkey(device_name, app)
-    dp = ios_monkey.mkdir()
+    ios_monkey = IOSMonkey(device_name, bundle_id=bundleId, device_udid=udid)
+    dp = ''
+    if screenshot:
+        dp = ios_monkey.mkdir()
 
     start_time = datetime.now()
     print("begin.")
@@ -167,6 +145,7 @@ def main():
         if (end_time - start_time).seconds >= run_time:
             break
     print("end.")
+
 
 if __name__ == '__main__':
     main()

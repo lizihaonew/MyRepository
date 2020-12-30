@@ -8,7 +8,7 @@ import threading
 import datetime
 import os
 import time
-from .libimobiledevice import get_devices, get_device_name, get_device_type, get_device_version, get_log, get_screenshot
+from libimobiledevice import get_devices, get_device_name, get_device_type, get_device_version, get_log, get_screenshot
 
 KEYWORDS = ["ANR ", "NullPointerException", "CRASH", "Force Closed"]
 
@@ -37,7 +37,7 @@ def filter_keyword(device):
     sub = get_log(device)
     with sub:
         for line in sub.stdout:
-            print(line.decode("utf-8"))
+            # print(line.decode("utf-8"))
             for key in KEYWORDS:
                 if line.decode("utf-8").find(key) != -1:
                     path = get_log_path("screenshot")

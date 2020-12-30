@@ -69,3 +69,6 @@ def uninstall_app():
     res = os.popen(command).read()
 
 
+if __name__ == '__main__':
+    result = get_devices()
+    print(result)
