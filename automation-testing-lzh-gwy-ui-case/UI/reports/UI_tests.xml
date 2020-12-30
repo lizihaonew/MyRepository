@@ -1,4 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?><testsuite errors="0" failures="0" name="pytest" skips="0" tests="3" time="16.122"><testcase classname="UI.wbs.cases.tests_asset_configuration.AssetConfigurationTestCase" file="UI/wbs/cases/tests_asset_configuration.py" line="12" name="test_choose_product" time="15.5526647568"><system-out>None
-</system-out></testcase><testcase classname="UI.wbs.cases.tests_asset_configuration.AssetConfigurationSmokeTest" file="UI/base_case.py" line="86" name="test_response_content_contains_selectors" time="10.4252898693"><system-out>None
-</system-out></testcase><testcase classname="UI.wbs.cases.tests_sign_in.SignInTest" file="UI/wbs/cases/tests_sign_in.py" line="6" name="test_sign_in_to_wbs" time="11.9691200256"><system-out>None
-</system-out></testcase></testsuite>
