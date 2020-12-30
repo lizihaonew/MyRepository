@@ -15,21 +15,21 @@ config.read('config.conf', encoding='utf-8-sig')
 section = 'DEFAULT'
 device_name = config.get(section, 'device_name')
 app = config.get(section, 'app')
-usenew_wda = config.get(section, 'usenew_wda')
-is_realdevice = config.get(section, 'is_realdevice')
+usenew_wda = eval(config.get(section, 'usenew_wda'))
+is_realdevice = eval(config.get(section, 'is_realdevice'))
 udid = config.get(section, 'udid')
 appium_host = config.get(section, 'appium_host')
 appium_port = config.get(section, 'appium_port')
-screenshot = config.get(section, 'screenshot')
+screenshot = eval(config.get(section, 'screenshot'))
 image_path = config.get(section, 'image_path')
-percentage_tap = config.get(section, 'percentage_tap')
-percentage_swipe = config.get(section, 'percentage_swipe')
-percentage_swipe_down = config.get(section, 'percentage_swipe_down')
-run_time = config.get(section, 'run_time')
+percentage_tap = int(config.get(section, 'percentage_tap'))
+percentage_swipe = int(config.get(section, 'percentage_swipe'))
+percentage_swipe_down = int(config.get(section, 'percentage_swipe_down'))
+run_time = int(config.get(section, 'run_time'))
 
 
 class IOSMonkey:
-    def __init__(self, devicename, app_path, usenewwda=False, realdevice=False, device_udid=""):
+    def __init__(self, devicename, app_path=None, usenewwda=False, realdevice=False, device_udid=""):
         self.device_name = devicename
         self.app = app_path
         self.is_usenew = usenewwda
@@ -42,6 +42,9 @@ class IOSMonkey:
         desired_caps['app'] = self.app
         desired_caps['automationName'] = 'XCUITest'
         desired_caps['useNewWDA'] = self.is_usenew
+        desired_caps['bundleId'] = 'com.dangdang.iphone'
+        desired_caps['platformVersion'] = '11.0'
+        desired_caps["udid"] = '871877d00ea5cf3f189a5eeeb1365babdbc9a3ad'
         if self.is_realdevice:
             desired_caps["xcodeOrgId"] = "ZTW9XPA927"
             desired_caps["xcodeSigningId"] = "iPhone Developer"
@@ -162,9 +165,8 @@ def main():
                 ios_monkey.save_screenshot(dp)
         end_time = datetime.now()
         if (end_time - start_time).seconds >= run_time:
-            print("end.")
             break
-
+    print("end.")
 
 if __name__ == '__main__':
     main()
