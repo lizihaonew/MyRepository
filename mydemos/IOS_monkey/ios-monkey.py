@@ -7,9 +7,10 @@ from appium import webdriver
 from random import randint
 import os
 
-class iOSMonkey:
 
-    def __init__(self, device_name,app,
+class IOSMonkey:
+
+    def __init__(self, device_name, app=None,
                  usenew_wda=False,
                  is_realdevice=False,
                  udid=""
@@ -108,8 +109,8 @@ class iOSMonkey:
 
 if __name__ == '__main__':
     device_name = "iPhone SE (2nd generation)"
-    app = "/Users/stephen/Library/Developer/Xcode/DerivedData/UICatalog-estpdzctecsychezfnpmtsgbjqwt/Build/Products/Debug-iphonesimulator/UICatalog.app"
-    iosmonkey = iOSMonkey(device_name, app)
+    # app = ""
+    iosmonkey = IOSMonkey(device_name)
     dp = iosmonkey.mkdir()
 
     # monkey run time: seconds,default 5 min
