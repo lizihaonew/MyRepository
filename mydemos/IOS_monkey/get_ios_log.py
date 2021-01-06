@@ -58,6 +58,25 @@ def get_log_path(tag):
     return path
 
 
+def get_device_info():
+    devices = get_devices()
+    device_num = len(devices)
+    if device_num == 1:
+        device_udid = devices[0]
+    elif device_num <1:
+        raise Exception('未查询到链接的设备，请检查后重试～')
+    else:
+        # mess_list = []
+        for i in range(1, device_num+1):
+            mess = "%s) %s" % (i, devices[i-1])
+            print(mess)
+        device_udid = input('请输入待链接的UDID：')
+    print('Connecting Device: ' + device_udid)
+    device_name = get_device_name(device_udid)
+    device_version = get_device_version(device_udid)
+    return [device_udid, device_name, device_version]
+
+
 def get_log_file(device, time_str):
     now_time_str = datetime.strftime(time_str, '%Y%m%d%H%M%S')
     log_name = '.'.join((now_time_str, 'log'))
@@ -73,13 +92,13 @@ def get_log_file(device, time_str):
         f.write(message)
     command = "idevicesyslog -u %s >> %s &" % (device, path)
     res = os.system(command)
-    print('IOS app log path: ' + path)
+    # print('IOS app log path: ' + path)
     return path
 
 
-def analyse_log_file(udid, log_path):
+def analyse_log_file(log_path):
     try:
-        command = "ps -ef | grep 'idevicesyslog -u %s' | awk '{print $2}' | xargs kill -9" % udid
+        command = "ps -ef | grep idevicesyslog | awk '{print $2}' | xargs kill -9" % udid
         os.popen(command)
     except Exception as e:
         pass
@@ -94,12 +113,10 @@ def analyse_log_file(udid, log_path):
 
 
 if __name__ == '__main__':
-    # show_devices()
-    # time.sleep(3)
-    # filter_keywords()
-    udId = '871877d00ea5cf3f189a5eeeb1365babdbc9a3ad'
-    logpath = '/Users/xujuan/Downloads/log.log'
-    print(analyse_log_file(udId, logpath))
+    # udId = '871877d00ea5cf3f189a5eeeb1365babdbc9a3ad'
+    logpath = '/Users/xujuan/Downloads/MyRepository/mydemos/IOS_monkey/logs/20210106162427.log'
+    print(analyse_log_file(logpath))
+    # print(get_device_info())
 
 
 
