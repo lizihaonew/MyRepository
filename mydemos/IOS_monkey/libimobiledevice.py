@@ -6,6 +6,7 @@
 
 import subprocess
 import os
+from datetime import datetime
 
 BASE_PATH = os.path.dirname(os.path.abspath(__file__))
 
@@ -55,17 +56,30 @@ def get_log(device):
     return sub
 
 
+def get_installed_app(device):
+    command = 'ideviceinstaller -u %s -l' % device
+    res = os.popen(command).read()
+    # return res.replace("\n", "")
+    return res.split('\n')
+
 # 安装应用  app名称中不能有空格
-def install_app():
+def install_app(udid):
     app = os.path.join(BASE_PATH, "xxx.ipa")
-    command = "ideviceinstaller -u fd655f67024bcadd9c64d49df00dfeb9e41d34cb -i %s" % app
+    command = "ideviceinstaller -u %s -i %s" % (udid, app)
     res = os.popen(command).read()
 
 
-# 卸载应用
-def uninstall_app():
-    bundleID = "cn.xxxxxx.ios"
-    command = "ideviceinstaller -u fd655f67024bcadd9c64d49df00dfeb9e41d34cb -U %s" % bundleID
+# 卸载应用bundleID = cn.xxxxxx.ios
+def uninstall_app(udid, bundleID):
+    # bundleID = ""
+    command = "ideviceinstaller -u %s -U %s" % (udid, bundleID)
     res = os.popen(command).read()
 
 
+if __name__ == '__main__':
+    # result = get_devices()
+    # print(result)
+    udid = '871877d00ea5cf3f189a5eeeb1365babdbc9a3ad'
+    # time_str = datetime.now()
+    # get_log_file(udid, time_str)
+    print(get_installed_app(udid))
