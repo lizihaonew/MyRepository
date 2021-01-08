@@ -23,6 +23,13 @@ def show_devices():
         print("设备名称：%s, 类型：%s, 系统版本：%s, UID:%s" % (device_name, device_type, device_version, device))
 
 
+def get_app_name(udid, bundleId):
+    apps = get_installed_app(udid)
+    for app in apps:
+        if bundleId in app:
+            bundle_id, app_version, app_name = app.split(',')
+            return eval(app_name.strip(" "))
+
 # 监控关键字
 def filter_keywords():
     devices = get_devices()
@@ -78,6 +85,11 @@ def get_device_info():
 
 
 def get_log_file(device, time_str):
+    try:
+        command = "ps -ef | grep 'idevicesyslog -u %s' | grep -v grep |awk '{print $2}' | xargs kill -9" % device
+        os.system(command)
+    except Exception as e:
+        pass
     now_time_str = datetime.strftime(time_str, '%Y%m%d%H%M%S')
     log_name = '.'.join((now_time_str, 'log'))
     log_path = os.path.join(BASE_PATH, 'logs')
@@ -96,10 +108,10 @@ def get_log_file(device, time_str):
     return path
 
 
-def analyse_log_file(log_path):
+def analyse_log_file(device, log_path):
     try:
-        command = "ps -ef | grep idevicesyslog | awk '{print $2}' | xargs kill -9" % udid
-        os.popen(command)
+        command = "ps -ef | grep 'idevicesyslog -u %s' | grep -v grep |awk '{print $2}' | xargs kill -9" % device
+        os.system(command)
     except Exception as e:
         pass
 
@@ -114,9 +126,10 @@ def analyse_log_file(log_path):
 
 if __name__ == '__main__':
     # udId = '871877d00ea5cf3f189a5eeeb1365babdbc9a3ad'
-    logpath = '/Users/xujuan/Downloads/MyRepository/mydemos/IOS_monkey/logs/20210106162427.log'
-    print(analyse_log_file(logpath))
+    # logpath = '/Users/xujuan/Downloads/MyRepository/mydemos/IOS_monkey/logs/20210106162427.log'
+    # print(analyse_log_file(logpath))
     # print(get_device_info())
-
+    app = get_app_name('871877d00ea5cf3f189a5eeeb1365babdbc9a3ad', 'com.dangdang.iphone')
+    print(app)
 
 
