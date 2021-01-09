@@ -56,6 +56,12 @@ def get_log(device):
     return sub
 
 
+def get_installed_app(device):
+    command = 'ideviceinstaller -u %s -l' % device
+    res = os.popen(command).read()
+    # return res.replace("\n", "")
+    return res.split('\n')
+
 # 安装应用  app名称中不能有空格
 def install_app(udid):
     app = os.path.join(BASE_PATH, "xxx.ipa")
@@ -76,3 +82,4 @@ if __name__ == '__main__':
     udid = '871877d00ea5cf3f189a5eeeb1365babdbc9a3ad'
     # time_str = datetime.now()
     # get_log_file(udid, time_str)
+    print(get_installed_app(udid))
